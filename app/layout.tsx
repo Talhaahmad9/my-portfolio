@@ -23,6 +23,9 @@ export const metadata: Metadata = {
   description:
     "AI Engineer and Next.js Developer specializing in building high-performance web applications and intelligent systems.",
   metadataBase: new URL("https://talhaahmad.vercel.app"),
+  verification: {
+    google: "76_987pdZ9u8OKA3pi0fkXpOklT-QRGBv0msa2sQ8VY",
+  },
   openGraph: {
     type: "website",
     locale: "en_US",
