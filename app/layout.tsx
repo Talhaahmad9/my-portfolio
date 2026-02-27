@@ -19,9 +19,9 @@ const geistMono = Geist_Mono({
 
 // ─── SEO Metadata ─────────────────────────────────────────────────────────────
 export const metadata: Metadata = {
-  title: "Talha Ahmad | AI Engineer & Next.js Developer",
+  title: "Talha Ahmad | Full Stack Developer & GenAI Specialist",
   description:
-    "AI Engineer and Next.js Developer specializing in building high-performance web applications and intelligent systems.",
+    "Full Stack Developer and GenAI Specialist building high-performance web applications and production-grade AI systems.",
   metadataBase: new URL("https://talhaahmad.vercel.app"),
   verification: {
     google: "76_987pdZ9u8OKA3pi0fkXpOklT-QRGBv0msa2sQ8VY",
@@ -31,23 +31,23 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: "https://talhaahmad.vercel.app",
     siteName: "Talha Ahmad",
-    title: "Talha Ahmad | AI Engineer & Next.js Developer",
+    title: "Talha Ahmad | Full Stack Developer & GenAI Specialist",
     description:
-      "AI Engineer and Next.js Developer specializing in building high-performance web applications and intelligent systems.",
+      "Full Stack Developer and GenAI Specialist building high-performance web applications and production-grade AI systems.",
     images: [
       {
         url: "/og-image.JPG",
         width: 1200,
         height: 630,
-        alt: "Talha Ahmad — AI Engineer & Next.js Developer",
+        alt: "Talha Ahmad — Full Stack Developer & GenAI Specialist",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Talha Ahmad | AI Engineer & Next.js Developer",
+    title: "Talha Ahmad | Full Stack Developer & GenAI Specialist",
     description:
-      "AI Engineer and Next.js Developer specializing in building high-performance web applications and intelligent systems.",
+      "Full Stack Developer and GenAI Specialist building high-performance web applications and production-grade AI systems.",
     images: ["/og-image.JPG"],
   },
 };
@@ -57,9 +57,9 @@ const personSchema = {
   "@context": "https://schema.org",
   "@type": "Person",
   name: "Talha Ahmad",
-  jobTitle: "AI Engineer",
+  jobTitle: "Full Stack Developer & GenAI Specialist",
   description: "Computer Science Student at IoBM",
-  url: "https://talhaahmad.dev",
+  url: "https://talhaahmad.vercel.app",
   sameAs: [
     "https://github.com/Talhaahmad9",
     "https://linkedin.com/in/talha-ahmad9",

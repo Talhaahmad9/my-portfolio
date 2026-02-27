@@ -34,7 +34,7 @@ export default function HeroSection() {
 
         <SectionItem>
           <p className="mb-3 text-sm font-medium uppercase tracking-widest text-orangeWeb">
-            AI Engineer &amp; Next.js Developer
+            Full Stack Developer &amp; GenAI Specialist
           </p>
         </SectionItem>
 

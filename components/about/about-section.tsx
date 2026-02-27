@@ -49,7 +49,7 @@ export default function AboutSection() {
             About Me
           </p>
           <h2 className="text-3xl font-semibold text-white sm:text-4xl">
-            Full-Stack AI Engineer
+            Full Stack Developer & GenAI Specialist
           </h2>
         </SectionItem>
 
@@ -60,7 +60,7 @@ export default function AboutSection() {
           <SectionItem>
             <div className="space-y-5 text-platinum leading-relaxed">
               <p>
-                I&apos;m Talha Ahmad — a Full-Stack AI Engineer and Computer
+                I&apos;m Talha Ahmad — a Full Stack Developer and GenAI Specialist, and Computer
                 Science student at the{" "}
                 <span className="text-white font-medium">
                   Institute of Business Management (IoBM), Karachi
