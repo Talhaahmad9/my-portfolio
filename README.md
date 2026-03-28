@@ -161,7 +161,7 @@ This project is optimised for **Vercel** deployment:
 
 | | |
 |---|---|
-| **Email** | [talhaahmaed999@gmail.com](mailto:talhaahmaed999@gmail.com) |
+| **Email** | [hi.talhaahmad@gmail.com](mailto:hi.talhaahmad@gmail.com) |
 | **LinkedIn** | [linkedin.com/in/talha-ahmad9](https://linkedin.com/in/talha-ahmad9) |
 | **GitHub** | [github.com/Talhaahmad9](https://github.com/Talhaahmad9) |
 
