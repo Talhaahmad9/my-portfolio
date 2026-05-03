@@ -28,8 +28,8 @@ interface ProjectPayload {
   order: number;
 }
 
-function toPlainProject(project: unknown): IProject {
-  return JSON.parse(JSON.stringify(project)) as IProject;
+function toPlainProject<T>(project: T): T {
+  return JSON.parse(JSON.stringify(project)) as T;
 }
 
 function parseStringArray(json: string | null): string[] {
