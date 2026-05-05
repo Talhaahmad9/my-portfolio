@@ -6,7 +6,7 @@ import { EMAIL, GITHUB_URL } from "@/lib/config";
 
 // ─── CTA Buttons (client island for hover animations) ─────────────────────────
 
-export default function HeroActions() {
+export default function HeroActions({ resumeUrl }: { resumeUrl: string | null }) {
   return (
     <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
       <motion.a
@@ -18,15 +18,19 @@ export default function HeroActions() {
         Hire Me
       </motion.a>
 
-      <motion.a
-        href="/Talha_Ahmad_CV.pdf"
-        download
-        whileHover={{ scale: 1.04 }}
-        whileTap={{ scale: 0.97 }}
-        className="inline-flex items-center gap-2 rounded-md border border-orangeWeb px-6 py-3 text-sm font-semibold text-orangeWeb transition-colors hover:bg-orangeWeb hover:text-black"
-      >
-        Download CV ↓
-      </motion.a>
+      {resumeUrl && (
+        <motion.a
+          href={resumeUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          download
+          whileHover={{ scale: 1.04 }}
+          whileTap={{ scale: 0.97 }}
+          className="inline-flex items-center gap-2 rounded-md border border-orangeWeb px-6 py-3 text-sm font-semibold text-orangeWeb transition-colors hover:bg-orangeWeb hover:text-black"
+        >
+          Download CV ↓
+        </motion.a>
+      )}
 
       <motion.a
         href={GITHUB_URL}

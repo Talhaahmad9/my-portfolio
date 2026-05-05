@@ -25,7 +25,7 @@ const navVariants = {
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export default function Navbar() {
+export default function Navbar({ resumeUrl }: { resumeUrl: string | null }) {
   return (
     <motion.header
       variants={navVariants}
@@ -83,17 +83,21 @@ export default function Navbar() {
           >
             LinkedIn
           </a>
-          <a
-            href="/Talha_Ahmad_CV.pdf"
-            download
-            className="rounded-md bg-orangeWeb px-4 py-1.5 text-sm font-semibold text-black hover:opacity-90 transition-opacity"
-          >
-            CV ↓
-          </a>
+          {resumeUrl && (
+            <a
+              href={resumeUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              download
+              className="rounded-md bg-orangeWeb px-4 py-1.5 text-sm font-semibold text-black hover:opacity-90 transition-opacity"
+            >
+              CV ↓
+            </a>
+          )}
         </div>
 
         {/* Mobile: hamburger (renders its own drawer) */}
-        <MobileMenu />
+        <MobileMenu resumeUrl={resumeUrl} />
       </nav>
     </motion.header>
   );

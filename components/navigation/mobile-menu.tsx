@@ -16,7 +16,7 @@ const drawerVariants = {
   exit:   { opacity: 0, y: -8 },
 };
 
-export default function MobileMenu() {
+export default function MobileMenu({ resumeUrl }: { resumeUrl: string | null }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -72,16 +72,20 @@ export default function MobileMenu() {
             </ul>
 
             {/* CV download in mobile menu too */}
-            <div className="mt-5 pt-5 border-t border-oxfordBlue">
-              <a
-                href="/Talha_Ahmad_CV.pdf"
-                download
-                onClick={() => setOpen(false)}
-                className="inline-flex items-center gap-2 rounded-md bg-orangeWeb px-4 py-2 text-sm font-semibold text-black hover:opacity-90 transition-opacity"
-              >
-                Download CV ↓
-              </a>
-            </div>
+            {resumeUrl && (
+              <div className="mt-5 pt-5 border-t border-oxfordBlue">
+                <a
+                  href={resumeUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  download
+                  onClick={() => setOpen(false)}
+                  className="inline-flex items-center gap-2 rounded-md bg-orangeWeb px-4 py-2 text-sm font-semibold text-black hover:opacity-90 transition-opacity"
+                >
+                  Download CV ↓
+                </a>
+              </div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

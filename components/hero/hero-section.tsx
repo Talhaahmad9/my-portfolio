@@ -6,7 +6,7 @@ import ParticleNetwork from "./particle-network";
 // ─── Hero Section (Server Component shell) ────────────────────────────────────
 // Animated children are isolated in the "use client" HeroActions island.
 
-export default function HeroSection() {
+export default function HeroSection({ resumeUrl }: { resumeUrl: string | null }) {
   return (
     <SectionWrapper
       id="hero"
@@ -53,7 +53,7 @@ export default function HeroSection() {
 
         <SectionItem>
           {/* Client island — handles hover / click animations */}
-          <HeroActions />
+          <HeroActions resumeUrl={resumeUrl} />
         </SectionItem>
 
       </div>

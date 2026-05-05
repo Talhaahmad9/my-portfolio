@@ -22,14 +22,14 @@ export const metadata: Metadata = {
   title: "Talha Ahmad | Full Stack Developer & GenAI Specialist",
   description:
     "Full Stack Developer and GenAI Specialist building high-performance web applications and production-grade AI systems.",
-  metadataBase: new URL("https://talhaahmad.vercel.app"),
+  metadataBase: new URL("https://talhaahmad.me"),
   verification: {
     google: "76_987pdZ9u8OKA3pi0fkXpOklT-QRGBv0msa2sQ8VY",
   },
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://talhaahmad.vercel.app",
+    url: "https://talhaahmad.me",
     siteName: "Talha Ahmad",
     title: "Talha Ahmad | Full Stack Developer & GenAI Specialist",
     description:
@@ -59,10 +59,11 @@ const personSchema = {
   name: "Talha Ahmad",
   jobTitle: "Full Stack Developer & GenAI Specialist",
   description: "Computer Science Student at IoBM",
-  url: "https://talhaahmad.vercel.app",
+  url: "https://talhaahmad.me",
   sameAs: [
     "https://github.com/Talhaahmad9",
     "https://linkedin.com/in/talha-ahmad9",
+    "https://talhaahmad.me",
   ],
 };
 
