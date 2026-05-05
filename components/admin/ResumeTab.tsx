@@ -7,6 +7,8 @@ import type { IResume } from "@/lib/db/models/Resume";
 import Toast from "@/components/admin/Toast";
 import ConfirmModal from "@/components/admin/ConfirmModal";
 import { useToast } from "@/components/admin/useToast";
+import LoadingButton from "@/components/admin/LoadingButton";
+import { typography } from "@/lib/typography";
 
 interface ResumeTabProps {
   activeResume: IResume | null;
@@ -156,15 +158,15 @@ export default function ResumeTab({ activeResume, resumes }: ResumeTabProps) {
   return (
     <section className="space-y-4">
       <div>
-        <p className="text-sm font-medium uppercase tracking-widest text-orangeWeb">Resume</p>
-        <h2 className="mt-2 text-2xl font-semibold text-white">Manage resume files</h2>
+        <p className={typography.adminEyebrow}>Resume</p>
+        <h2 className={`mt-2 ${typography.adminTitle}`}>Manage resume files</h2>
       </div>
 
       <div className="rounded-xl border border-oxfordBlue bg-oxfordBlue/40 p-4">
-        <p className="text-sm font-medium uppercase tracking-widest text-orangeWeb">Active Resume</p>
+        <p className={typography.adminEyebrow}>Active Resume</p>
         {resolvedActive ? (
           <div className="mt-3 space-y-2">
-            <h3 className="text-base font-semibold text-white">{resolvedActive.label}</h3>
+            <h3 className={typography.adminCardTitle}>{resolvedActive.label}</h3>
             <p className="text-sm text-platinum">Uploaded {formatDate(resolvedActive.uploadedAt)}</p>
             <a
               href={resolvedActive.fileUrl}
@@ -182,7 +184,7 @@ export default function ResumeTab({ activeResume, resumes }: ResumeTabProps) {
       </div>
 
       <div className="rounded-xl border border-oxfordBlue bg-oxfordBlue/40 p-4 space-y-3">
-        <p className="text-sm font-medium uppercase tracking-widest text-orangeWeb">Upload PDF</p>
+        <p className={typography.adminEyebrow}>Upload PDF</p>
 
         <div>
           <label className="mb-2 block text-sm text-platinum">Label</label>
@@ -211,15 +213,15 @@ export default function ResumeTab({ activeResume, resumes }: ResumeTabProps) {
           ) : null}
         </div>
 
-        <button
-          type="button"
+        <LoadingButton
           onClick={() => void handleUpload()}
-          disabled={isUploading}
+          loading={isUploading}
+          loadingText="Uploading..."
           className="inline-flex items-center gap-2 rounded-md bg-orangeWeb px-4 py-2 text-sm font-semibold text-black transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-70"
         >
-          {isUploading ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <Upload className="h-4 w-4" aria-hidden="true" />}
-          {isUploading ? "Uploading..." : "Upload Resume"}
-        </button>
+          <Upload className="h-4 w-4" aria-hidden="true" />
+          Upload Resume
+        </LoadingButton>
       </div>
 
       <div className="space-y-3">
@@ -253,12 +255,12 @@ export default function ResumeTab({ activeResume, resumes }: ResumeTabProps) {
                     ) : null}
                   </div>
 
-                  <div className="flex flex-wrap items-center gap-2">
+                  <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
                     <a
                       href={resume.fileUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 rounded-md border border-oxfordBlue bg-black px-3 py-1.5 text-xs font-medium text-platinum hover:text-orangeWeb"
+                      className="inline-flex items-center gap-1.5 rounded-md border border-oxfordBlue bg-black px-3 py-2 text-sm font-medium text-platinum hover:text-orangeWeb"
                     >
                       <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
                       Download
@@ -268,7 +270,7 @@ export default function ResumeTab({ activeResume, resumes }: ResumeTabProps) {
                       type="button"
                       onClick={() => void handleSetActive(resume)}
                       disabled={isActive || isRowLoading}
-                      className="inline-flex items-center gap-1.5 rounded-md border border-oxfordBlue bg-black px-3 py-1.5 text-xs font-medium text-platinum hover:text-orangeWeb disabled:cursor-not-allowed disabled:opacity-60"
+                      className="inline-flex items-center gap-1.5 rounded-md border border-oxfordBlue bg-black px-3 py-2 text-sm font-medium text-platinum hover:text-orangeWeb disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       {isRowLoading ? (
                         <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
@@ -282,7 +284,7 @@ export default function ResumeTab({ activeResume, resumes }: ResumeTabProps) {
                       type="button"
                       onClick={() => requestDelete(resume)}
                       disabled={isRowLoading}
-                      className="inline-flex items-center gap-1.5 rounded-md border border-red-500/40 bg-black px-3 py-1.5 text-xs font-medium text-red-400 hover:border-red-400 hover:text-red-300 disabled:cursor-not-allowed disabled:opacity-60"
+                      className="inline-flex items-center gap-1.5 rounded-md border border-red-500/40 bg-black px-3 py-2 text-sm font-medium text-red-400 hover:border-red-400 hover:text-red-300 disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       {isRowLoading ? (
                         <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />

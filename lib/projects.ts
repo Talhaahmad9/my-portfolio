@@ -21,7 +21,7 @@ export const PROJECTS: Project[] = [
     ],
     tags: ["LangGraph", "Gemini 2.0 Flash", "Python", "Multi-Agent", "Next.js"],
     githubUrl: "https://github.com/Talhaahmad9/GenAi_DSS",
-    badge: "🏆 1st Place — Hackfest × Datathon - IBA 2026",
+    badge: "1st Place — Hackfest × Datathon - IBA 2026",
   },
   {
     title: "Vestra — E-Commerce Platform",

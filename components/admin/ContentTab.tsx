@@ -4,7 +4,6 @@ import { useState } from "react";
 import {
   ChevronDown,
   ChevronUp,
-  Loader2,
   Plus,
   Trash2,
   X,
@@ -20,6 +19,7 @@ import type { IAchievement, ISkillGroup } from "@/lib/db/models/SiteConfig";
 import Toast from "@/components/admin/Toast";
 import ConfirmModal from "@/components/admin/ConfirmModal";
 import { useToast } from "@/components/admin/useToast";
+import LoadingButton from "@/components/admin/LoadingButton";
 import { typography } from "@/lib/typography";
 
 // ─── Props ────────────────────────────────────────────────────────────────────
@@ -418,15 +418,14 @@ export default function ContentTab({ config }: ContentTabProps) {
             </div>
           </div>
 
-          <button
-            type="button"
+          <LoadingButton
             onClick={() => void handleHeroSave()}
-            disabled={heroLoading}
+            loading={heroLoading}
+            loadingText="Saving Hero..."
             className="inline-flex items-center gap-2 rounded-md bg-orangeWeb px-4 py-2 text-sm font-semibold text-black hover:bg-orangeWeb/90 disabled:opacity-60"
           >
-            {heroLoading && <Loader2 className="h-4 w-4 animate-spin" />}
             Save Hero
-          </button>
+          </LoadingButton>
         </div>
       )}
 
@@ -488,15 +487,14 @@ export default function ContentTab({ config }: ContentTabProps) {
             </div>
           </div>
 
-          <button
-            type="button"
+          <LoadingButton
             onClick={() => void handleAboutSave()}
-            disabled={aboutLoading}
+            loading={aboutLoading}
+            loadingText="Saving About..."
             className="inline-flex items-center gap-2 rounded-md bg-orangeWeb px-4 py-2 text-sm font-semibold text-black hover:bg-orangeWeb/90 disabled:opacity-60"
           >
-            {aboutLoading && <Loader2 className="h-4 w-4 animate-spin" />}
             Save About
-          </button>
+          </LoadingButton>
         </div>
       )}
 
@@ -652,15 +650,14 @@ export default function ContentTab({ config }: ContentTabProps) {
               </div>
 
               <div className="flex gap-3 pt-2">
-                <button
-                  type="button"
+                <LoadingButton
                   onClick={() => void saveAchievement()}
-                  disabled={achievementsLoading}
+                  loading={achievementsLoading}
+                  loadingText="Saving..."
                   className="inline-flex items-center gap-2 rounded-md bg-orangeWeb px-4 py-2 text-sm font-semibold text-black hover:bg-orangeWeb/90 disabled:opacity-60"
                 >
-                  {achievementsLoading && <Loader2 className="h-4 w-4 animate-spin" />}
                   {editingAchievementIndex !== null ? "Save Changes" : "Add Achievement"}
-                </button>
+                </LoadingButton>
                 <button
                   type="button"
                   onClick={() => setAchievementView("list")}
@@ -742,15 +739,14 @@ export default function ContentTab({ config }: ContentTabProps) {
           </button>
 
           <div className="pt-2">
-            <button
-              type="button"
+            <LoadingButton
               onClick={() => void handleSkillsSave()}
-              disabled={skillsLoading}
+              loading={skillsLoading}
+              loadingText="Saving Skills..."
               className="inline-flex items-center gap-2 rounded-md bg-orangeWeb px-4 py-2 text-sm font-semibold text-black hover:bg-orangeWeb/90 disabled:opacity-60"
             >
-              {skillsLoading && <Loader2 className="h-4 w-4 animate-spin" />}
               Save Skills
-            </button>
+            </LoadingButton>
           </div>
         </div>
       )}

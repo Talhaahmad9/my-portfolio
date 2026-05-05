@@ -4,6 +4,7 @@ import { randomUUID } from "crypto";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { IProject, ProjectModel } from "@/lib/db/models/Project";
+import { normalizeProjectBadgeLabel } from "@/lib/project-badges";
 import { projectSchema } from "@/lib/validate";
 import { sanitizeObject } from "@/lib/sanitize";
 import { deleteFromR2, extractR2Key, uploadToR2 } from "@/lib/r2";
@@ -128,7 +129,7 @@ function buildProjectPayload(formData: FormData, images: string[]): ProjectPaylo
     ...sanitized,
     liveUrl: normalizeOptionalString(sanitized.liveUrl),
     githubUrl: normalizeOptionalString(sanitized.githubUrl),
-    badge: normalizeOptionalString(sanitized.badge),
+    badge: normalizeProjectBadgeLabel(sanitized.badge),
   };
 }
 

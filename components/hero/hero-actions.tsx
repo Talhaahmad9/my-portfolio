@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { ArrowRight, Download, FolderGit2, Mail } from "lucide-react";
 import { EMAIL, GITHUB_URL } from "@/lib/config";
 
 // ─── CTA Buttons (client island for hover animations) ─────────────────────────
@@ -13,8 +14,9 @@ export default function HeroActions({ resumeUrl }: { resumeUrl: string | null })
         href={`mailto:${EMAIL}`}
         whileHover={{ scale: 1.04 }}
         whileTap={{ scale: 0.97 }}
-        className="inline-flex items-center gap-2 rounded-md bg-orangeWeb px-6 py-3 text-sm font-semibold text-black transition-opacity hover:opacity-90"
+        className="inline-flex items-center gap-2 rounded-md bg-orangeWeb px-6 py-3.5 text-base font-semibold text-black transition-opacity hover:opacity-90"
       >
+        <Mail className="h-4 w-4" aria-hidden="true" />
         Hire Me
       </motion.a>
 
@@ -26,9 +28,10 @@ export default function HeroActions({ resumeUrl }: { resumeUrl: string | null })
           download
           whileHover={{ scale: 1.04 }}
           whileTap={{ scale: 0.97 }}
-          className="inline-flex items-center gap-2 rounded-md border border-orangeWeb px-6 py-3 text-sm font-semibold text-orangeWeb transition-colors hover:bg-orangeWeb hover:text-black"
+          className="inline-flex items-center gap-2 rounded-md border border-orangeWeb px-6 py-3.5 text-base font-semibold text-orangeWeb transition-colors hover:bg-orangeWeb hover:text-black"
         >
-          Download CV ↓
+          <Download className="h-4 w-4" aria-hidden="true" />
+          Download CV
         </motion.a>
       )}
 
@@ -38,8 +41,9 @@ export default function HeroActions({ resumeUrl }: { resumeUrl: string | null })
         rel="noopener noreferrer"
         whileHover={{ scale: 1.04 }}
         whileTap={{ scale: 0.97 }}
-        className="inline-flex items-center gap-2 rounded-md border border-platinum px-6 py-3 text-sm font-semibold text-platinum transition-colors hover:border-orangeWeb hover:text-orangeWeb"
+        className="inline-flex items-center gap-2 rounded-md border border-platinum px-6 py-3.5 text-base font-semibold text-platinum transition-colors hover:border-orangeWeb hover:text-orangeWeb"
       >
+        <FolderGit2 className="h-4 w-4" aria-hidden="true" />
         GitHub
       </motion.a>
 
@@ -50,9 +54,10 @@ export default function HeroActions({ resumeUrl }: { resumeUrl: string | null })
       >
         <Link
           href="#projects"
-          className="text-sm text-platinum underline-offset-4 hover:text-orangeWeb hover:underline"
+          className="inline-flex items-center gap-2 text-base text-platinum underline-offset-4 hover:text-orangeWeb hover:underline"
         >
-          View my work ↓
+          View my work
+          <ArrowRight className="h-4 w-4" aria-hidden="true" />
         </Link>
       </motion.div>
     </div>

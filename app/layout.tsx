@@ -1,12 +1,20 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist_Mono, Instrument_Sans, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import PageTransition from "@/components/shared/page-transition";
 import BackToTop from "@/components/shared/back-to-top";
+import CursorGlow from "@/components/shared/cursor-glow";
+import ParticleNetwork from "@/components/hero/particle-network";
 
 // ─── Fonts ────────────────────────────────────────────────────────────────────
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const bodyFont = Instrument_Sans({
+  variable: "--font-body",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+const headingFont = Space_Grotesk({
+  variable: "--font-heading",
   subsets: ["latin"],
   display: "swap",
 });
@@ -82,8 +90,10 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} bg-black text-white antialiased`}
+        className={`${bodyFont.variable} ${headingFont.variable} ${geistMono.variable} relative overflow-x-hidden bg-[#0d1117] text-white antialiased`}
       >
+        <ParticleNetwork fullscreen className="pointer-events-none fixed inset-0 z-0 h-full w-full opacity-65" />
+        <CursorGlow />
         <PageTransition>{children}</PageTransition>
         <BackToTop />
       </body>

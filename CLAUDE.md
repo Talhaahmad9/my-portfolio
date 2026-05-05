@@ -377,22 +377,20 @@ Three management sections accessible via tabs:
 
 ## Current Status
 
-**Completed (existing codebase):**
+**Completed:**
 
-- Full public portfolio: Hero (particle network), About (skills, certs, achievement card), Projects (static from `lib/projects.ts`), Footer
-- SEO: metadata, JSON-LD, OG image, sitemap, robots
-- Responsive design + mobile menu
-- Framer Motion scroll reveals throughout
+- **Backend & Admin:** Fully integrated MongoDB Atlas with all 4 models. NextAuth v5 Credentials auth is active with `proxy.ts` protecting the dashboard. Cloudflare R2 integration via `@aws-sdk/client-s3` handles image and resume uploads. Full Server Actions (CRUD) deployed for projects, wins, and resumes. Admin dashboard allows complete content management.
+- **Dynamic Content:** Public portfolio dynamically fetches Projects and Hall of Fame (wins) from MongoDB. CV download links dynamically fetch the active resume URL across the Hero, Navbar, and Mobile Menu.
+- **UI & Components:**
+  - `HeroSection`: Integrates `particle-network` and an animated `HeroTypewriter` for dynamic title sequences.
+  - `CursorGlow`: Custom `<canvas>`-based comet trail effect tracking cursor movements with dynamic ambient lighting, layered gradients, and `mixBlendMode: screen`.
+  - `ProjectGrid` & `WinsGrid`: Responsive grids mapping over DB data; projects include `embla-carousel-react` image sliders.
+- **Styling:** Unified deep dark aesthetic (`#0d1117` base) with refined contrast layers across sections (`bg-oxfordBlue/20`, `bg-black/40`, etc.). Larger typography scale in Hero.
+- **SEO & Domain:** Metadata, JSON-LD, OG image, sitemap, and robots fully configured for `talhaahmad.me`.
+- **Animations:** Consistent Framer Motion scroll reveals via the `SectionWrapper` / `SectionItem` pattern.
 
-**To build:**
+**To build / Next Steps:**
 
-1. MongoDB connection + all 4 models
-2. NextAuth v5 Credentials auth + admin seed script
-3. `proxy.ts` middleware for route protection
-4. Cloudflare R2 client + upload/delete helpers
-5. Server Actions: projects, wins, resume, auth
-6. Admin UI: login page + dashboard (projects/wins/resume tabs)
-7. Update public portfolio to fetch projects + wins from MongoDB
-8. Dynamic CV download button (fetches active resume URL)
-9. Image carousel on project cards (`embla-carousel-react`)
-10. Update `metadataBase`, sitemap, robots to `talhaahmad.me`
+- Continue iterating on portfolio content via the admin dashboard.
+- Monitor Cloudflare R2 usage and MongoDB performance as assets grow.
+- Add additional interactive micro-animations if desired.

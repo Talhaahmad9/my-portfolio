@@ -2,6 +2,7 @@
 
 import { IWin } from "@/lib/db/models/Win";
 import { Trophy } from "lucide-react";
+import { typography } from "@/lib/typography";
 
 interface WinCardProps {
   win: IWin;
@@ -25,27 +26,27 @@ export default function WinCard({ win }: WinCardProps) {
     <div className="group flex h-full flex-col rounded-lg border border-platinum/10 bg-oxfordBlue p-6 transition-colors hover:border-orangeWeb">
       <div className="flex items-start justify-between gap-4 mb-4">
         <Trophy size={20} className="text-orangeWeb shrink-0" />
-        <span className={`rounded-md px-2.5 py-0.5 text-xs font-semibold ${getBadgeColors(win.place)}`}>
+        <span className={`rounded-md px-2.5 py-1 text-sm font-semibold ${getBadgeColors(win.place)}`}>
           {win.place}
         </span>
       </div>
 
-      <h3 className="text-lg font-semibold text-white">
+      <h3 className={typography.cardTitle}>
         {win.title}
       </h3>
       
-      <p className="mt-1 text-sm text-platinum">
+      <p className="mt-2 text-base text-platinum">
         {win.event}
       </p>
 
       {win.score && (
-        <p className="mt-2 text-sm font-medium text-orangeWeb">
+        <p className="mt-3 text-base font-medium text-orangeWeb">
           Score: {win.score}
         </p>
       )}
 
       {win.description && (
-        <p className="mt-3 text-sm text-platinum line-clamp-3 flex-1">
+        <p className="mt-3 flex-1 text-base leading-7 text-platinum line-clamp-3">
           {win.description}
         </p>
       )}
@@ -55,7 +56,7 @@ export default function WinCard({ win }: WinCardProps) {
           {win.stack.map((item) => (
             <span
               key={item}
-              className="rounded-full border border-platinum/20 px-3 py-0.5 text-xs text-platinum"
+              className="rounded-full border border-platinum/20 px-3 py-1 text-sm text-platinum"
             >
               {item}
             </span>
@@ -64,7 +65,7 @@ export default function WinCard({ win }: WinCardProps) {
       )}
 
       <div className="mt-auto pt-5">
-        <p className="text-xs text-platinum/60">
+        <p className="text-sm text-platinum/60">
           {formattedDate}
         </p>
       </div>

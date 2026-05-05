@@ -2,11 +2,13 @@
 
 import { useMemo, useState } from "react";
 import type { IProject } from "@/lib/db/models/Project";
-import { Loader2, Pencil, Plus, Trash2, X } from "lucide-react";
+import { Pencil, Plus, Trash2, X } from "lucide-react";
 import { createProject, deleteProject, updateProject } from "@/actions/projects";
 import Toast from "@/components/admin/Toast";
 import ConfirmModal from "@/components/admin/ConfirmModal";
 import { useToast } from "@/components/admin/useToast";
+import LoadingButton from "@/components/admin/LoadingButton";
+import { typography } from "@/lib/typography";
 
 type Mode = "list" | "form";
 
@@ -192,8 +194,8 @@ export default function ProjectsTab({ projects }: ProjectsTabProps) {
   return (
     <section className="space-y-4">
       <div>
-        <p className="text-sm font-medium uppercase tracking-widest text-orangeWeb">Projects</p>
-        <h2 className="mt-2 text-2xl font-semibold text-white">Manage projects</h2>
+        <p className={typography.adminEyebrow}>Projects</p>
+        <h2 className={`mt-2 ${typography.adminTitle}`}>Manage projects</h2>
       </div>
 
       <div className="rounded-xl border border-oxfordBlue bg-oxfordBlue/40 p-4">
@@ -250,11 +252,11 @@ export default function ProjectsTab({ projects }: ProjectsTabProps) {
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-2">
+                      <div className="mt-2 flex w-full flex-wrap items-center gap-2 sm:mt-0 sm:w-auto">
                         <button
                           type="button"
                           onClick={() => startEdit(project)}
-                          className="inline-flex items-center gap-1.5 rounded-md border border-oxfordBlue bg-black px-3 py-1.5 text-xs font-medium text-platinum transition-colors hover:border-orangeWeb hover:text-orangeWeb"
+                          className="inline-flex items-center gap-1.5 rounded-md border border-oxfordBlue bg-black px-3 py-2 text-sm font-medium text-platinum transition-colors hover:border-orangeWeb hover:text-orangeWeb"
                         >
                           <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
                           Edit
@@ -262,7 +264,7 @@ export default function ProjectsTab({ projects }: ProjectsTabProps) {
                         <button
                           type="button"
                           onClick={() => requestDelete(project)}
-                          className="inline-flex items-center gap-1.5 rounded-md border border-red-500/40 bg-black px-3 py-1.5 text-xs font-medium text-red-400 transition-colors hover:border-red-400 hover:text-red-300"
+                          className="inline-flex items-center gap-1.5 rounded-md border border-red-500/40 bg-black px-3 py-2 text-sm font-medium text-red-400 transition-colors hover:border-red-400 hover:text-red-300"
                         >
                           <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
                           Delete
@@ -276,7 +278,7 @@ export default function ProjectsTab({ projects }: ProjectsTabProps) {
         </div>
       ) : (
         <div className="space-y-4 rounded-xl border border-oxfordBlue bg-oxfordBlue/40 p-4">
-          <h3 className="text-lg font-semibold text-white">
+          <h3 className={typography.adminCardTitle}>
             {editingId ? "Edit project" : "Create project"}
           </h3>
 
@@ -423,8 +425,12 @@ export default function ProjectsTab({ projects }: ProjectsTabProps) {
                 type="text"
                 value={form.badge}
                 onChange={(event) => setForm((current) => ({ ...current, badge: event.target.value }))}
+                placeholder="1st Place — Hackfest × Datathon 2026"
                 className="w-full rounded-md border border-oxfordBlue bg-black px-3 py-2 text-platinum outline-none focus:border-orangeWeb"
               />
+              <p className="mt-2 text-sm text-platinum/70">
+                Emoji are removed automatically. Use plain badge text only.
+              </p>
             </div>
 
             <div>
@@ -533,15 +539,14 @@ export default function ProjectsTab({ projects }: ProjectsTabProps) {
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <button
-              type="button"
+            <LoadingButton
               onClick={() => void handleSubmit()}
-              disabled={isSubmitting}
+              loading={isSubmitting}
+              loadingText="Saving..."
               className="inline-flex items-center gap-2 rounded-md bg-orangeWeb px-4 py-2 text-sm font-semibold text-black transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-70"
             >
-              {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : null}
-              {isSubmitting ? "Saving..." : editingId ? "Update Project" : "Create Project"}
-            </button>
+              {editingId ? "Update Project" : "Create Project"}
+            </LoadingButton>
             <button
               type="button"
               onClick={cancelForm}

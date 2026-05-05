@@ -28,7 +28,7 @@ export default function Toast({ toast, onClose }: ToastProps) {
 
   return (
     <div
-      className={`fixed bottom-5 right-5 z-100 w-[calc(100%-2.5rem)] max-w-sm rounded-md border-l-4 bg-oxfordBlue p-4 shadow-2xl transition-all duration-200 ${
+      className={`fixed right-1/2 bottom-3 z-40 w-[calc(100%-1.5rem)] max-w-sm translate-x-1/2 rounded-md border-l-4 bg-oxfordBlue p-4 shadow-2xl transition-all duration-200 sm:right-5 sm:bottom-5 sm:w-[calc(100%-2.5rem)] sm:translate-x-0 ${
         isSuccess ? "border-l-green-500" : "border-l-red-500"
       } ${isVisible ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"}`}
       role="status"

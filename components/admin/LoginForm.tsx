@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Loader2, Lock } from "lucide-react";
 import { loginAction } from "@/actions/auth";
+import { typography } from "@/lib/typography";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -51,8 +52,10 @@ export default function LoginForm() {
             <Lock className="h-5 w-5" aria-hidden="true" />
           </div>
           <div>
-            <p className="text-sm font-medium uppercase tracking-widest text-orangeWeb">Admin</p>
-            <h1 className="text-2xl font-semibold text-white">Talha Ahmad</h1>
+            <p className={typography.adminEyebrow}>Admin</p>
+            <h1 className="font-heading text-3xl font-semibold tracking-tight text-white">
+              Talha Ahmad
+            </h1>
           </div>
         </div>
 

@@ -20,12 +20,21 @@ const CONNECTION_DISTANCE = 130;
 const CURSOR_ATTRACT_DISTANCE = 160;
 const CURSOR_ATTRACT_STRENGTH = 0.012;
 const BASE_SPEED = 0.35;
+const GRID_SPACING = 72;
 const DOT_COLOR = "20, 33, 61";       // oxfordBlue  #14213d  (r,g,b)
 const LINE_COLOR = "252, 163, 17";    // orangeWeb   #fca311  (r,g,b)
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export default function ParticleNetwork() {
+interface ParticleNetworkProps {
+  fullscreen?: boolean;
+  className?: string;
+}
+
+export default function ParticleNetwork({
+  fullscreen = false,
+  className,
+}: ParticleNetworkProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const mouse = useRef({ x: -9999, y: -9999 });
   const particles = useRef<Particle[]>([]);
@@ -42,12 +51,19 @@ export default function ParticleNetwork() {
 
     // ── Resize ──────────────────────────────────────────────────────────────
     const resize = () => {
+      if (fullscreen) {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        return;
+      }
+
       canvas.width = canvas.offsetWidth;
       canvas.height = canvas.offsetHeight;
     };
     resize();
-    const ro = new ResizeObserver(resize);
-    ro.observe(canvas);
+    const ro = fullscreen ? null : new ResizeObserver(resize);
+    ro?.observe(canvas);
+    window.addEventListener("resize", resize);
 
     // ── Init particles ───────────────────────────────────────────────────────
     const init = () => {
@@ -68,6 +84,27 @@ export default function ParticleNetwork() {
       const pts = particles.current;
       const mx = mouse.current.x;
       const my = mouse.current.y;
+
+      // Subtle site-wide grid so the background reads beyond the hero section.
+      ctx.beginPath();
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = "rgba(20, 33, 61, 0.12)";
+      for (let x = 0; x <= canvas.width; x += GRID_SPACING) {
+        ctx.moveTo(x + 0.5, 0);
+        ctx.lineTo(x + 0.5, canvas.height);
+      }
+      for (let y = 0; y <= canvas.height; y += GRID_SPACING) {
+        ctx.moveTo(0, y + 0.5);
+        ctx.lineTo(canvas.width, y + 0.5);
+      }
+      ctx.stroke();
+
+      for (let x = GRID_SPACING; x < canvas.width; x += GRID_SPACING * 3) {
+        for (let y = GRID_SPACING; y < canvas.height; y += GRID_SPACING * 3) {
+          ctx.strokeStyle = "rgba(252, 163, 17, 0.08)";
+          ctx.strokeRect(x - 12, y - 12, 24, 24);
+        }
+      }
 
       // Update positions
       for (const p of pts) {
@@ -139,28 +176,48 @@ export default function ParticleNetwork() {
 
     // ── Mouse tracking ───────────────────────────────────────────────────────
     const onMouseMove = (e: MouseEvent) => {
+      if (fullscreen) {
+        mouse.current = { x: e.clientX, y: e.clientY };
+        return;
+      }
+
       const rect = canvas.getBoundingClientRect();
       mouse.current = { x: e.clientX - rect.left, y: e.clientY - rect.top };
     };
     const onMouseLeave = () => { mouse.current = { x: -9999, y: -9999 }; };
-    canvas.addEventListener("mousemove", onMouseMove);
-    canvas.addEventListener("mouseleave", onMouseLeave);
+    if (fullscreen) {
+      window.addEventListener("mousemove", onMouseMove);
+      window.addEventListener("mouseleave", onMouseLeave);
+    } else {
+      canvas.addEventListener("mousemove", onMouseMove);
+      canvas.addEventListener("mouseleave", onMouseLeave);
+    }
 
     return () => {
       cancelAnimationFrame(rafId.current);
-      ro.disconnect();
+      ro?.disconnect();
+      window.removeEventListener("resize", resize);
       document.removeEventListener("visibilitychange", onVisibilityChange);
-      canvas.removeEventListener("mousemove", onMouseMove);
-      canvas.removeEventListener("mouseleave", onMouseLeave);
+      if (fullscreen) {
+        window.removeEventListener("mousemove", onMouseMove);
+        window.removeEventListener("mouseleave", onMouseLeave);
+      } else {
+        canvas.removeEventListener("mousemove", onMouseMove);
+        canvas.removeEventListener("mouseleave", onMouseLeave);
+      }
     };
-  }, []);
+  }, [fullscreen]);
 
   return (
     <canvas
       ref={canvasRef}
       aria-hidden="true"
-      className="absolute inset-0 h-full w-full pointer-events-none"
-      style={{ pointerEvents: "auto" }} // needed for mousemove but not clicks
+      className={
+        className ??
+        (fullscreen
+          ? "pointer-events-none fixed inset-0 h-full w-full opacity-70"
+          : "absolute inset-0 h-full w-full pointer-events-none")
+      }
     />
   );
 }
