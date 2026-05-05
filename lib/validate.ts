@@ -41,9 +41,46 @@ export const resumeSchema = z.object({
   fileUrl: z.string().url("Must be a valid URL"),
 });
 
+// ── Site Config ───────────────────────────────────────────────────────────────
+
+export const achievementSchema = z.object({
+  title: z.string().min(1, "Title is required"),
+  event: z.string().min(1, "Event is required"),
+  place: z.string().min(1, "Place is required"),
+  score: z.string().optional(),
+  description: z.string().optional(),
+  liveUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
+  githubUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
+  stack: z.array(z.string()).default([]),
+});
+
+export const skillGroupSchema = z.object({
+  category: z.string().min(1, "Category is required"),
+  items: z.array(z.string()).default([]),
+});
+
+export const certificationSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  issuer: z.string().min(1, "Issuer is required"),
+});
+
+export const heroConfigSchema = z.object({
+  tagline: z.string().min(1, "Tagline is required"),
+  typewriterStrings: z.array(z.string().min(1)).min(1, "At least one string required"),
+});
+
+export const aboutConfigSchema = z.object({
+  bio: z.string().min(1, "Bio is required"),
+  certifications: z.array(certificationSchema),
+});
+
 // ── Inferred types ────────────────────────────────────────────────────────────
 
 export type LoginInput = z.infer<typeof loginSchema>;
 export type ProjectInput = z.infer<typeof projectSchema>;
 export type WinInput = z.infer<typeof winSchema>;
 export type ResumeInput = z.infer<typeof resumeSchema>;
+export type AchievementInput = z.infer<typeof achievementSchema>;
+export type SkillGroupInput = z.infer<typeof skillGroupSchema>;
+export type HeroConfigInput = z.infer<typeof heroConfigSchema>;
+export type AboutConfigInput = z.infer<typeof aboutConfigSchema>;

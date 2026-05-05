@@ -9,19 +9,30 @@ import Footer        from "@/components/contact/footer";
 import { getProjects } from "@/actions/projects";
 import { getWins } from "@/actions/wins";
 import { getActiveResume } from "@/actions/resume";
+import { getSiteConfig } from "@/actions/config";
 
 export default async function Home() {
   const projects = await getProjects();
   const wins = await getWins();
   const activeResume = await getActiveResume();
   const resumeUrl = activeResume?.fileUrl ?? null;
+  const siteConfig = await getSiteConfig();
 
   return (
     <>
       <Navbar resumeUrl={resumeUrl} />
       <main>
-        <HeroSection resumeUrl={resumeUrl} />
-        <AboutSection />
+        <HeroSection
+          resumeUrl={resumeUrl}
+          tagline={siteConfig.hero.tagline}
+          typewriterStrings={siteConfig.hero.typewriterStrings}
+        />
+        <AboutSection
+          bio={siteConfig.about.bio}
+          achievements={siteConfig.about.achievements}
+          skills={siteConfig.about.skills}
+          certifications={siteConfig.about.certifications}
+        />
         <WinsSection wins={wins} />
         <ProjectGrid projects={projects} />
         <Footer />
