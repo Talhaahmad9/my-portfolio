@@ -44,7 +44,7 @@ export const metadata: Metadata = {
       "Full Stack Developer and GenAI Specialist building high-performance web applications and production-grade AI systems.",
     images: [
       {
-        url: "/og-image.JPG",
+        url: "/avatar.png",
         width: 1200,
         height: 630,
         alt: "Talha Ahmad — Full Stack Developer & GenAI Specialist",
@@ -53,7 +53,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Talha Ahmad | Full Stack Developer & GenAI Specialist",
+    title: "Talha Ahmad | Full Stack Developer",
     description:
       "Full Stack Developer and GenAI Specialist building high-performance web applications and production-grade AI systems.",
     images: ["/og-image.JPG"],
