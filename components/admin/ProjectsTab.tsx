@@ -98,12 +98,27 @@ export default function ProjectsTab({ projects }: ProjectsTabProps) {
   const [projectToDelete, setProjectToDelete] = useState<IProject | null>(null);
   const [form, setForm] = useState<ProjectFormState>(initialFormState);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [previewWidth, setPreviewWidth] = useState(640);
+  const [previewHeight, setPreviewHeight] = useState(360);
+  const [previewFit, setPreviewFit] = useState<"cover" | "contain">("cover");
   const { toast, showToast, hideToast } = useToast();
 
   const newImagePreviews = useMemo(
     () => form.newImages.map((file) => ({ file, src: URL.createObjectURL(file) })),
     [form.newImages]
   );
+
+  const primaryPreviewImage = useMemo(() => {
+    if (newImagePreviews.length > 0) {
+      return newImagePreviews[0]?.src ?? null;
+    }
+
+    if (form.existingImages.length > 0) {
+      return form.existingImages[0] ?? null;
+    }
+
+    return null;
+  }, [newImagePreviews, form.existingImages]);
 
   const startCreate = (): void => {
     setEditingId(null);
@@ -478,6 +493,77 @@ export default function ProjectsTab({ projects }: ProjectsTabProps) {
               <p className="mt-2 text-xs text-platinum/70">
                 Supported formats: JPG, PNG, WebP, AVIF, GIF, SVG.
               </p>
+
+              <div className="mt-4 rounded-lg border border-oxfordBlue bg-black/35 p-4">
+                <div className="mb-3 flex flex-wrap items-end gap-3">
+                  <div>
+                    <label className="mb-1 block text-xs font-medium uppercase tracking-[0.18em] text-platinum/60">
+                      Preview Width
+                    </label>
+                    <input
+                      type="number"
+                      min={120}
+                      max={1400}
+                      value={previewWidth}
+                      onChange={(event) =>
+                        setPreviewWidth(Math.max(120, Number(event.target.value) || 120))
+                      }
+                      className="w-28 rounded-md border border-oxfordBlue bg-black px-3 py-2 text-sm text-platinum outline-none focus:border-orangeWeb"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-xs font-medium uppercase tracking-[0.18em] text-platinum/60">
+                      Preview Height
+                    </label>
+                    <input
+                      type="number"
+                      min={80}
+                      max={900}
+                      value={previewHeight}
+                      onChange={(event) =>
+                        setPreviewHeight(Math.max(80, Number(event.target.value) || 80))
+                      }
+                      className="w-28 rounded-md border border-oxfordBlue bg-black px-3 py-2 text-sm text-platinum outline-none focus:border-orangeWeb"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-xs font-medium uppercase tracking-[0.18em] text-platinum/60">
+                      Fit Mode
+                    </label>
+                    <select
+                      value={previewFit}
+                      onChange={(event) => setPreviewFit(event.target.value as "cover" | "contain")}
+                      className="rounded-md border border-oxfordBlue bg-black px-3 py-2 text-sm text-platinum outline-none focus:border-orangeWeb"
+                    >
+                      <option value="cover">Cover</option>
+                      <option value="contain">Contain</option>
+                    </select>
+                  </div>
+                </div>
+
+                <p className="mb-2 text-xs text-platinum/70">
+                  Live render preview using current dimensions and fit mode.
+                </p>
+
+                <div className="overflow-auto rounded-md border border-oxfordBlue/70 bg-black/50 p-3">
+                  <div
+                    className="relative overflow-hidden rounded-md border border-oxfordBlue/80 bg-black"
+                    style={{ width: `${previewWidth}px`, height: `${previewHeight}px` }}
+                  >
+                    {primaryPreviewImage ? (
+                      <img
+                        src={primaryPreviewImage}
+                        alt="Project display preview"
+                        className={`h-full w-full ${previewFit === "contain" ? "object-contain" : "object-cover"}`}
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center text-sm text-platinum/60">
+                        Select at least one image to preview.
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
 
               {form.existingImages.length > 0 ? (
                 <div className="mt-3">
