@@ -45,7 +45,7 @@ This project solves that by introducing a secure CMS-like admin experience where
 2. Add, edit, reorder, and delete projects.
 3. Manage hall-of-fame wins.
 4. Upload and switch active resumes.
-5. Upload certificate images and share them through dedicated public certificate pages.
+5. Upload certificate images, reorder certificates, and share them through dedicated public certificate pages.
 
 Everything on the public site is sourced dynamically from MongoDB, so content changes are fast and code-free.
 
@@ -58,7 +58,7 @@ Everything on the public site is sourced dynamically from MongoDB, so content ch
 | Area | What it does |
 |---|---|
 | Navbar + Hero | Identity, CTA actions, dynamic active CV link |
-| About | Bio, auto-playing achievements slideshow, skills, tappable certificate cards, certifications (from SiteConfig) |
+| About | Bio, auto-playing achievements slideshow, skills, and adaptive certificate display (grid for up to 3, slideshow for more) |
 | Wins | Dynamic records from MongoDB |
 | Projects | Dynamic cards and image carousel from MongoDB + R2 |
 | Footer | Contact endpoints and profile links |
@@ -69,7 +69,7 @@ Everything on the public site is sourced dynamically from MongoDB, so content ch
 | Route | Purpose |
 |---|---|
 | /admin | Secure login for admin |
-| /admin/dashboard/content | Edit Hero and About content, including achievement slide ordering and certificate image uploads |
+| /admin/dashboard/content | Edit Hero and About content, including achievement ordering, certificate ordering, and certificate image uploads |
 | /admin/dashboard/projects | Full project CRUD and ordering |
 | /admin/dashboard/wins | Add/remove wins |
 | /admin/dashboard/resume | Upload, activate, and delete resumes |
@@ -84,7 +84,8 @@ Everything on the public site is sourced dynamically from MongoDB, so content ch
 | Secure admin auth | NextAuth v5 Credentials, protected dashboard routes |
 | Project media pipeline | Multi-image upload and deletion using Cloudflare R2 |
 | Resume management | Active resume switching reflected instantly in public CTAs |
-| Certificate media pipeline | Admin-managed certificate image uploads with preview, replacement, cleanup, and stable public share pages |
+| Certificate media pipeline | Admin-managed certificate image uploads with preview, replacement, cleanup, ordering controls, and stable public share pages |
+| Adaptive certificate UX | About section uses a card grid for small sets and a slow auto-playing slideshow when certificate count grows |
 | Input integrity | Zod validation + sanitization before DB writes |
 | SEO foundation | Metadata API, JSON-LD Person schema, Open Graph, sitemap, robots |
 | Animation system | Shared SectionWrapper and SectionItem reveal pattern |
@@ -217,6 +218,7 @@ Collections used:
 4. `siteconfigs` acts as a singleton content source for Hero and About sections.
 5. `about.achievements` is an ordered array, and that order drives the public slideshow sequence.
 6. `about.certifications` can now carry opaque public IDs and R2-backed image URLs for shareable certificate pages.
+7. `about.certifications` array order is managed in admin and directly controls public certificate order in both grid and slideshow modes.
 
 ---
 
@@ -324,8 +326,9 @@ Recommended checks after deploy:
 2. Admin login redirects and protection rules work.
 3. Project image upload/delete works.
 4. Resume activate/deactivate flow works across Hero/Nav/Mobile Menu.
-5. Certificate image upload and replacement works from the content dashboard.
-6. Shared certificate URLs resolve correctly and remain excluded from indexing.
+5. Certificate image upload, reorder controls, and replacement work from the content dashboard.
+6. Certificate display uses grid for 1 to 3 cards and switches to slideshow for 4+ cards with slow autoplay.
+7. Shared certificate URLs resolve correctly and remain excluded from indexing.
 
 ---
 

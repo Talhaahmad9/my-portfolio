@@ -278,6 +278,17 @@ export default function ContentTab({ config }: ContentTabProps) {
       })
     );
 
+  const moveCertificate = (index: number, direction: "up" | "down") => {
+    const targetIndex = direction === "up" ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= certs.length) return;
+
+    setCerts((prev) => {
+      const next = [...prev];
+      [next[index], next[targetIndex]] = [next[targetIndex]!, next[index]!];
+      return next;
+    });
+  };
+
   // ── Achievements handlers ───────────────────────────────────────────────────
 
   const openAddAchievement = () => {
@@ -572,6 +583,9 @@ export default function ContentTab({ config }: ContentTabProps) {
                 <Plus className="h-3.5 w-3.5" /> Add
               </button>
             </div>
+            <p className="mb-3 text-xs text-platinum/60">
+              Public cards and slideshow use this order. Move certificates up or down before saving.
+            </p>
             <div className="space-y-3">
               {certs.map((cert, i) => (
                 <div
@@ -580,6 +594,9 @@ export default function ContentTab({ config }: ContentTabProps) {
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 space-y-3">
+                      <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-orangeWeb/75">
+                        Certificate {String(i + 1).padStart(2, "0")}
+                      </p>
                       <input
                         type="text"
                         placeholder="Certificate name"
@@ -595,14 +612,34 @@ export default function ContentTab({ config }: ContentTabProps) {
                         className="w-full rounded-md border border-platinum/20 bg-black px-3 py-2 text-sm text-white placeholder:text-platinum/50 focus:outline-none focus:ring-1 focus:ring-orangeWeb"
                       />
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => removeCert(i)}
-                      className="p-2 text-platinum hover:text-orangeWeb"
-                      aria-label={`Remove ${cert.name || "certificate"}`}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
+                    <div className="flex shrink-0 items-start gap-1">
+                      <button
+                        type="button"
+                        onClick={() => moveCertificate(i, "up")}
+                        disabled={i === 0}
+                        className="p-1.5 text-platinum hover:text-white disabled:opacity-30"
+                        aria-label={`Move ${cert.name || "certificate"} up`}
+                      >
+                        <ChevronUp className="h-4 w-4" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => moveCertificate(i, "down")}
+                        disabled={i === certs.length - 1}
+                        className="p-1.5 text-platinum hover:text-white disabled:opacity-30"
+                        aria-label={`Move ${cert.name || "certificate"} down`}
+                      >
+                        <ChevronDown className="h-4 w-4" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => removeCert(i)}
+                        className="p-1.5 text-platinum hover:text-orangeWeb"
+                        aria-label={`Remove ${cert.name || "certificate"}`}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
                   </div>
 
                   <div className="grid gap-4 sm:grid-cols-[140px_1fr]">
