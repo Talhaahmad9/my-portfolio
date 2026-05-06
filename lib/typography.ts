@@ -2,7 +2,7 @@ export const typography = {
   heroKicker:
     "font-heading text-base font-medium uppercase tracking-[0.24em] text-orangeWeb sm:text-lg",
   heroName:
-    "font-heading text-6xl font-semibold leading-none tracking-tight text-white sm:text-8xl",
+    "font-heading whitespace-nowrap text-5xl font-semibold leading-none tracking-tight text-white sm:text-8xl",
   heroRole:
     "font-heading text-4xl font-semibold tracking-tight text-platinum/70 sm:text-6xl lg:text-7xl",
   sectionEyebrow:
