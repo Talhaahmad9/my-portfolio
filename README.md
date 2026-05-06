@@ -58,9 +58,10 @@ Everything on the public site is sourced dynamically from MongoDB, so content ch
 | Area | What it does |
 |---|---|
 | Navbar + Hero | Identity, CTA actions, dynamic active CV link |
-| About | Bio, auto-playing achievements slideshow, skills, and adaptive certificate display (grid for up to 3, slideshow for more) |
+| About | Bio, auto-playing achievements slideshow, and skills |
+| Projects | Dynamic cards and image carousel from MongoDB + R2, positioned directly after About |
+| Certifications | Dedicated certificate section with adaptive display (grid for up to 3, slideshow for more) |
 | Wins | Dynamic records from MongoDB |
-| Projects | Dynamic cards and image carousel from MongoDB + R2 |
 | Footer | Contact endpoints and profile links |
 | Certificate pages | Shareable direct-link certificate detail pages backed by opaque IDs |
 
@@ -85,8 +86,8 @@ Everything on the public site is sourced dynamically from MongoDB, so content ch
 | Project media pipeline | Multi-image upload and deletion using Cloudflare R2, including SVG logo uploads |
 | Resume management | Active resume switching reflected instantly in public CTAs |
 | Certificate media pipeline | Admin-managed certificate image uploads with preview, replacement, cleanup, ordering controls, and stable public share pages |
-| Adaptive certificate UX | About section uses a card grid for small sets and a slow auto-playing slideshow when certificate count grows (desktop: 3 per slide, mobile: 1 per slide) |
-| Input integrity | Zod validation + sanitization before DB writes |
+| Adaptive certificate UX | Certifications has its own dedicated section and uses a card grid for small sets and a slow auto-playing slideshow when certificate count grows (desktop: 3 per slide, mobile: 1 per slide) |
+| Input integrity | Zod validation + sanitization before DB writes, with shared sanitizers preserving Date values for admin flows like win creation |
 | SEO foundation | Metadata API, JSON-LD Person schema, Open Graph, sitemap, robots |
 | Animation system | Shared SectionWrapper and SectionItem reveal pattern |
 | Achievement storytelling | About section supports multiple achievements with slideshow controls and admin-managed ordering |
@@ -215,7 +216,7 @@ Collections used:
 1. `projects` are sorted by `order` for stable display.
 2. `wins` are sorted by latest date first.
 3. `resume` keeps exactly one active CV at a time.
-4. `siteconfigs` acts as a singleton content source for Hero and About sections.
+4. `siteconfigs` acts as a singleton content source for Hero, About, and Certifications content.
 5. `about.achievements` is an ordered array, and that order drives the public slideshow sequence.
 6. `about.certifications` can now carry opaque public IDs and R2-backed image URLs for shareable certificate pages.
 7. `about.certifications` array order is managed in admin and directly controls public certificate order in both grid and slideshow modes.

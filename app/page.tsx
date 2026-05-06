@@ -2,6 +2,7 @@
 import Navbar        from "@/components/navigation/navbar";
 import HeroSection   from "@/components/hero/hero-section";
 import AboutSection  from "@/components/about/about-section";
+import CertificationsSection from "@/components/about/certifications-section";
 import ProjectGrid   from "@/components/projects/project-grid";
 import WinsSection   from "@/components/wins/wins-section";
 import Footer        from "@/components/contact/footer";
@@ -31,10 +32,10 @@ export default async function Home() {
           bio={siteConfig.about.bio}
           achievements={siteConfig.about.achievements}
           skills={siteConfig.about.skills}
-          certifications={siteConfig.about.certifications}
         />
-        <WinsSection wins={wins} />
         <ProjectGrid projects={projects} />
+        <CertificationsSection certifications={siteConfig.about.certifications} />
+        <WinsSection wins={wins} />
         <Footer />
       </main>
     </>

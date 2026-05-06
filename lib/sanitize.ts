@@ -30,6 +30,10 @@ export function sanitizeObject<T>(obj: T): T {
     return normalizePlainText(obj) as T;
   }
 
+  if (obj instanceof Date) {
+    return obj;
+  }
+
   if (Array.isArray(obj)) {
     return obj.map((item) => sanitizeObject(item)) as T;
   }
@@ -48,6 +52,10 @@ export function sanitizeObject<T>(obj: T): T {
 export function decodeLegacyEscapedContent<T>(obj: T): T {
   if (typeof obj === "string") {
     return decodeHtmlEntities(obj) as T;
+  }
+
+  if (obj instanceof Date) {
+    return obj;
   }
 
   if (Array.isArray(obj)) {
