@@ -1,10 +1,10 @@
 "use client";
 
-import { ArrowRight, ArrowUpRight, Trophy } from "lucide-react";
+import Image from "next/image";
+import { ArrowUpRight, FolderGit2, Trophy } from "lucide-react";
 import { IProject } from "@/lib/db/models/Project";
 import { normalizeProjectBadgeLabel } from "@/lib/project-badges";
 import { typography } from "@/lib/typography";
-import ProjectCarousel from "./project-carousel";
 
 interface ProjectCardProps {
   project: IProject;
@@ -12,83 +12,74 @@ interface ProjectCardProps {
 
 export default function ProjectCard({ project }: ProjectCardProps) {
   const badgeLabel = normalizeProjectBadgeLabel(project.badge);
+  const primaryImage = project.images?.[0];
 
   return (
-    <div className="group flex h-full flex-col rounded-lg border border-platinum/10 bg-black p-6 transition-colors hover:border-orangeWeb overflow-hidden">
+    <div className="group flex h-full flex-col rounded-lg border border-platinum/10 bg-black transition-all hover:border-orangeWeb hover:shadow-[0_0_24px_rgba(252,163,17,0.15)] overflow-hidden">
       
-      {project.images && project.images.length > 0 && (
-        <div className="-mx-6 -mt-6 mb-6">
-          <ProjectCarousel images={project.images} title={project.title} imageFit={project.imageFit ?? "cover"} />
+      {/* Image Section */}
+      {primaryImage ? (
+        <div className="relative aspect-video w-full overflow-hidden bg-black/40">
+          <Image
+            src={primaryImage}
+            alt={project.title}
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            className={`object-${project.imageFit === "contain" ? "contain" : "cover"} transition-transform duration-300 group-hover:scale-105`}
+          />
+        </div>
+      ) : (
+        <div className="flex aspect-video items-center justify-center bg-oxfordBlue/40">
+          <p className="text-sm text-platinum/60">No image</p>
         </div>
       )}
 
-      {/* Badge */}
-      {badgeLabel && (
-        <span className="mb-4 inline-flex items-center gap-2 self-start rounded-md bg-orangeWeb px-3 py-1.5 text-sm font-semibold text-black">
-          <Trophy className="h-4 w-4" aria-hidden="true" />
-          {badgeLabel}
-        </span>
-      )}
+      {/* Content Section */}
+      <div className="flex flex-1 flex-col justify-between gap-2 p-3">
+        
+        {/* Title + Badge */}
+        <div className="space-y-1.5">
+          {badgeLabel && (
+            <span className="inline-flex items-center gap-0.5 rounded-sm bg-orangeWeb/10 px-1.5 py-0.5 text-[10px] font-semibold text-orangeWeb">
+              <Trophy className="h-2.5 w-2.5" aria-hidden="true" />
+              {badgeLabel}
+            </span>
+          )}
+          <h3 className="line-clamp-2 text-sm font-semibold text-white transition-colors group-hover:text-orangeWeb">
+            {project.title}
+          </h3>
+        </div>
 
-      {/* Title */}
-      <h3 className={`${typography.cardTitle} transition-colors group-hover:text-orangeWeb`}>
-        {project.title}
-      </h3>
-
-      {/* Description */}
-      <p className={`mt-3 ${typography.cardBody}`}>
-        {project.description}
-      </p>
-
-      {/* Bullets */}
-      <ul className="mt-4 space-y-1.5 flex-1">
-        {project.bullets.map((b) => (
-          <li key={b} className="flex items-start gap-2 text-base text-platinum">
-            <ArrowRight className="mt-1 h-4 w-4 shrink-0 text-orangeWeb" aria-hidden="true" />
-            {b}
-          </li>
-        ))}
-      </ul>
-
-      {/* Tags */}
-      <div className="mt-5 flex flex-wrap gap-2">
-        {project.tags.map((tag) => (
-          <span
-            key={tag}
-            className="rounded-full border border-platinum/20 px-3 py-1 text-sm text-platinum"
-          >
-            {tag}
-          </span>
-        ))}
+        {/* Links */}
+        {(project.liveUrl || project.githubUrl) && (
+          <div className="flex flex-wrap gap-1.5 pt-1">
+            {project.liveUrl && (
+              <a
+                href={project.liveUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="inline-flex items-center gap-0.5 rounded-sm bg-orangeWeb px-1.5 py-0.5 text-[10px] font-semibold text-black transition-colors hover:bg-orangeWeb/90"
+              >
+                Live
+                <ArrowUpRight className="h-2.5 w-2.5" aria-hidden="true" />
+              </a>
+            )}
+            {project.githubUrl && (
+              <a
+                href={project.githubUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="inline-flex items-center gap-0.5 rounded-sm border border-platinum/30 px-1.5 py-0.5 text-[10px] font-semibold text-platinum transition-colors hover:border-orangeWeb hover:text-orangeWeb"
+              >
+                <FolderGit2 className="h-2.5 w-2.5" aria-hidden="true" />
+                Code
+              </a>
+            )}
+          </div>
+        )}
       </div>
-
-      {/* Links */}
-      {(project.liveUrl || project.githubUrl) && (
-        <div className="mt-auto flex items-center gap-4 border-t border-platinum/10 pt-4">
-          {project.liveUrl && (
-            <a
-              href={project.liveUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-sm text-orangeWeb underline-offset-4 hover:underline"
-            >
-              Live
-              <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
-            </a>
-          )}
-          {project.githubUrl && (
-            <a
-              href={project.githubUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-sm text-platinum transition-colors hover:text-orangeWeb"
-            >
-              GitHub
-              <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
-            </a>
-          )}
-        </div>
-      )}
     </div>
   );
 }

@@ -7,7 +7,7 @@ import { typography } from "@/lib/typography";
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function ProjectGrid({ projects }: { projects: IProject[] }) {
-  const useShowcase = projects.length >= 3;
+  const useShowcase = projects.length > 3;
 
   return (
     <SectionWrapper id="projects" className="bg-black/40 py-24 px-6">

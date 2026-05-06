@@ -49,7 +49,7 @@ export default function ProjectShowcase({ projects }: ProjectShowcaseProps) {
     const desktopQuery = window.matchMedia("(min-width: 1024px)");
 
     const updateCardsPerSlide = (matches: boolean) => {
-      setCardsPerSlide(matches ? 2 : 1);
+      setCardsPerSlide(matches ? 3 : 1);
     };
 
     updateCardsPerSlide(desktopQuery.matches);
@@ -123,7 +123,7 @@ export default function ProjectShowcase({ projects }: ProjectShowcaseProps) {
         </div>
       </div>
       <p className="mb-4 text-xs text-platinum/55 lg:text-sm lg:text-platinum/65">
-        Auto-rotates every few seconds, and pauses when you interact. Desktop shows two projects per slide.
+        Auto-rotates every few seconds, and pauses when you interact. Desktop shows three projects per slide.
       </p>
 
       <div className="relative">
@@ -134,7 +134,7 @@ export default function ProjectShowcase({ projects }: ProjectShowcaseProps) {
                 key={`project-slide-${slideIndex}`}
                 className="min-w-0 flex-[0_0_100%] px-1"
               >
-                <div className="grid gap-4 lg:grid-cols-2">
+                <div className="grid gap-3 lg:grid-cols-3">
                   {slide.map((project) => (
                     <ProjectCard
                       key={project._id ? String(project._id) : project.title}

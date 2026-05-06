@@ -2,45 +2,30 @@
 
 import { useMemo, useState } from "react";
 import type { IProject } from "@/lib/db/models/Project";
-import { Pencil, Plus, Trash2, X } from "lucide-react";
+import { Pencil, Plus, Trash2, X, Image as ImageIcon } from "lucide-react";
 import { createProject, deleteProject, updateProject } from "@/actions/projects";
 import Toast from "@/components/admin/Toast";
 import ConfirmModal from "@/components/admin/ConfirmModal";
 import { useToast } from "@/components/admin/useToast";
-import LoadingButton from "@/components/admin/LoadingButton";
 import { typography } from "@/lib/typography";
 
 type Mode = "list" | "form";
 
 interface ProjectFormState {
   title: string;
-  description: string;
-  bullets: string[];
-  tags: string[];
-  tagInput: string;
-  imageFit: "cover" | "contain";
   liveUrl: string;
   githubUrl: string;
   badge: string;
-  featured: boolean;
   order: number;
   existingImages: string[];
   newImages: File[];
 }
 
-type PreviewMode = "website" | "custom";
-
 const initialFormState: ProjectFormState = {
   title: "",
-  description: "",
-  bullets: [""],
-  tags: [],
-  tagInput: "",
-  imageFit: "cover",
   liveUrl: "",
   githubUrl: "",
   badge: "",
-  featured: false,
   order: 0,
   existingImages: [],
   newImages: [],
@@ -51,23 +36,12 @@ function getProjectId(project: IProject): string {
   return typeof maybeId === "string" ? maybeId : String(maybeId);
 }
 
-function isSvgImage(url: string): boolean {
-  const cleanUrl = url.split("?")[0]?.split("#")[0] ?? url;
-  return cleanUrl.toLowerCase().endsWith(".svg");
-}
-
 function toFormState(project: IProject): ProjectFormState {
   return {
     title: project.title,
-    description: project.description,
-    bullets: project.bullets.length > 0 ? project.bullets : [""],
-    tags: project.tags,
-    tagInput: "",
-    imageFit: project.imageFit ?? "cover",
     liveUrl: project.liveUrl ?? "",
     githubUrl: project.githubUrl ?? "",
     badge: project.badge ?? "",
-    featured: project.featured,
     order: project.order,
     existingImages: project.images,
     newImages: [],
@@ -77,17 +51,14 @@ function toFormState(project: IProject): ProjectFormState {
 function buildSubmitPayload(form: ProjectFormState): FormData {
   const payload = new FormData();
   payload.set("title", form.title);
-  payload.set("description", form.description);
-  payload.set(
-    "bullets",
-    JSON.stringify(form.bullets.map((bullet) => bullet.trim()).filter((bullet) => bullet.length > 0))
-  );
-  payload.set("tags", JSON.stringify(form.tags));
-  payload.set("imageFit", form.imageFit);
+  payload.set("description", "");
+  payload.set("bullets", JSON.stringify([]));
+  payload.set("tags", JSON.stringify([]));
+  payload.set("imageFit", "cover");
   payload.set("liveUrl", form.liveUrl);
   payload.set("githubUrl", form.githubUrl);
   payload.set("badge", form.badge);
-  payload.set("featured", String(form.featured));
+  payload.set("featured", "false");
   payload.set("order", String(form.order));
   payload.set("existingImages", JSON.stringify(form.existingImages));
 
@@ -109,28 +80,12 @@ export default function ProjectsTab({ projects }: ProjectsTabProps) {
   const [projectToDelete, setProjectToDelete] = useState<IProject | null>(null);
   const [form, setForm] = useState<ProjectFormState>(initialFormState);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [previewWidth, setPreviewWidth] = useState(640);
-  const [previewHeight, setPreviewHeight] = useState(360);
-  const [previewFit, setPreviewFit] = useState<"cover" | "contain">("cover");
-  const [previewMode, setPreviewMode] = useState<PreviewMode>("website");
   const { toast, showToast, hideToast } = useToast();
 
   const newImagePreviews = useMemo(
     () => form.newImages.map((file) => ({ file, src: URL.createObjectURL(file) })),
     [form.newImages]
   );
-
-  const primaryPreviewImage = useMemo(() => {
-    if (newImagePreviews.length > 0) {
-      return newImagePreviews[0]?.src ?? null;
-    }
-
-    if (form.existingImages.length > 0) {
-      return form.existingImages[0] ?? null;
-    }
-
-    return null;
-  }, [newImagePreviews, form.existingImages]);
 
   const startCreate = (): void => {
     setEditingId(null);
@@ -172,21 +127,18 @@ export default function ProjectsTab({ projects }: ProjectsTabProps) {
     showToast("Project deleted successfully", "success");
   };
 
-  const handleAddTag = (): void => {
-    const value = form.tagInput.trim();
-    if (!value || form.tags.includes(value)) {
+  const handleSubmit = async (): Promise<void> => {
+    if (isSubmitting) {
       return;
     }
 
-    setForm((current) => ({
-      ...current,
-      tags: [...current.tags, value],
-      tagInput: "",
-    }));
-  };
+    if (!form.title.trim()) {
+      showToast("Title is required", "error");
+      return;
+    }
 
-  const handleSubmit = async (): Promise<void> => {
-    if (isSubmitting) {
+    if (form.existingImages.length === 0 && form.newImages.length === 0) {
+      showToast("At least one image is required", "error");
       return;
     }
 
@@ -256,47 +208,48 @@ export default function ProjectsTab({ projects }: ProjectsTabProps) {
                 return (
                   <article
                     key={id}
-                    className="rounded-xl border border-oxfordBlue bg-oxfordBlue/40 p-4"
+                    className="flex items-center justify-between gap-4 rounded-lg border border-oxfordBlue bg-black/40 p-4"
                   >
-                    <div className="flex flex-wrap items-start justify-between gap-3">
-                      <div>
-                        <h3 className="text-base font-semibold text-white">{project.title}</h3>
-                        <p className="mt-1 text-xs text-platinum/80">Order: {project.order}</p>
-                        <div className="mt-2 flex flex-wrap gap-2">
-                          {project.tags.map((tag) => (
-                            <span
-                              key={`${id}-${tag}`}
-                              className="rounded-full border border-oxfordBlue bg-black px-2.5 py-1 text-xs text-platinum"
-                            >
-                              {tag}
-                            </span>
-                          ))}
-                          {project.featured ? (
-                            <span className="rounded-full bg-orangeWeb/20 px-2.5 py-1 text-xs font-medium text-orangeWeb">
-                              Featured
-                            </span>
-                          ) : null}
+                    <div className="flex min-w-0 flex-1 items-center gap-3">
+                      {project.images && project.images[0] ? (
+                        <div className="h-12 w-12 flex-shrink-0 overflow-hidden rounded-md border border-oxfordBlue/50">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={project.images[0]}
+                            alt={project.title}
+                            className="h-full w-full object-cover"
+                          />
                         </div>
+                      ) : (
+                        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-md border border-oxfordBlue/50 bg-black/50">
+                          <ImageIcon className="h-6 w-6 text-platinum/40" aria-hidden="true" />
+                        </div>
+                      )}
+                      <div className="min-w-0 flex-1">
+                        <h4 className="truncate font-semibold text-white">{project.title}</h4>
+                        <p className="text-xs text-platinum/70">
+                          Order: {project.order} • {project.images.length} image{project.images.length !== 1 ? "s" : ""}
+                        </p>
                       </div>
+                    </div>
 
-                      <div className="mt-2 flex w-full flex-wrap items-center gap-2 sm:mt-0 sm:w-auto">
-                        <button
-                          type="button"
-                          onClick={() => startEdit(project)}
-                          className="inline-flex items-center gap-1.5 rounded-md border border-oxfordBlue bg-black px-3 py-2 text-sm font-medium text-platinum transition-colors hover:border-orangeWeb hover:text-orangeWeb"
-                        >
-                          <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
-                          Edit
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => requestDelete(project)}
-                          className="inline-flex items-center gap-1.5 rounded-md border border-red-500/40 bg-black px-3 py-2 text-sm font-medium text-red-400 transition-colors hover:border-red-400 hover:text-red-300"
-                        >
-                          <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
-                          Delete
-                        </button>
-                      </div>
+                    <div className="flex flex-wrap items-center gap-2 sm:flex-nowrap">
+                      <button
+                        type="button"
+                        onClick={() => startEdit(project)}
+                        className="inline-flex items-center gap-1.5 rounded-md border border-oxfordBlue bg-black px-3 py-2 text-sm font-medium text-platinum transition-colors hover:border-orangeWeb hover:text-orangeWeb"
+                      >
+                        <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
+                        Edit
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => requestDelete(project)}
+                        className="inline-flex items-center gap-1.5 rounded-md border border-red-500/40 bg-black px-3 py-2 text-sm font-medium text-red-400 transition-colors hover:border-red-400 hover:text-red-300"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
+                        Delete
+                      </button>
                     </div>
                   </article>
                 );
@@ -304,449 +257,177 @@ export default function ProjectsTab({ projects }: ProjectsTabProps) {
           )}
         </div>
       ) : (
-        <div className="space-y-4 rounded-xl border border-oxfordBlue bg-oxfordBlue/40 p-4">
+        <form onSubmit={(e) => { e.preventDefault(); void handleSubmit(); }} className="space-y-4 rounded-xl border border-oxfordBlue bg-oxfordBlue/40 p-4">
           <h3 className={typography.adminCardTitle}>
             {editingId ? "Edit project" : "Create project"}
           </h3>
 
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="md:col-span-2">
+          <div className="space-y-4">
+            {/* Title */}
+            <div>
               <label className="mb-2 block text-sm font-medium text-platinum">Title</label>
               <input
                 type="text"
                 value={form.title}
-                onChange={(event) => setForm((current) => ({ ...current, title: event.target.value }))}
+                onChange={(e) => setForm((c) => ({ ...c, title: e.target.value }))}
                 className="w-full rounded-md border border-oxfordBlue bg-black px-3 py-2 text-platinum outline-none focus:border-orangeWeb"
+                placeholder="Project name"
               />
             </div>
 
-            <div className="md:col-span-2">
-              <label className="mb-2 block text-sm font-medium text-platinum">Description</label>
-              <textarea
-                value={form.description}
-                onChange={(event) =>
-                  setForm((current) => ({ ...current, description: event.target.value }))
-                }
-                rows={4}
-                className="w-full rounded-md border border-oxfordBlue bg-black px-3 py-2 text-platinum outline-none focus:border-orangeWeb"
-              />
-            </div>
-
-            <div className="md:col-span-2">
-              <label className="mb-2 block text-sm font-medium text-platinum">Bullets</label>
-              <div className="space-y-2">
-                {form.bullets.map((bullet, index) => (
-                  <div key={`bullet-${index}`} className="flex items-center gap-2">
-                    <input
-                      type="text"
-                      value={bullet}
-                      onChange={(event) =>
-                        setForm((current) => ({
-                          ...current,
-                          bullets: current.bullets.map((item, itemIndex) =>
-                            itemIndex === index ? event.target.value : item
-                          ),
-                        }))
-                      }
-                      className="w-full rounded-md border border-oxfordBlue bg-black px-3 py-2 text-platinum outline-none focus:border-orangeWeb"
-                    />
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setForm((current) => ({
-                          ...current,
-                          bullets:
-                            current.bullets.length === 1
-                              ? [""]
-                              : current.bullets.filter((_, itemIndex) => itemIndex !== index),
-                        }))
-                      }
-                      className="rounded-md border border-oxfordBlue bg-black p-2 text-platinum hover:text-orangeWeb"
-                    >
-                      <X className="h-4 w-4" aria-hidden="true" />
-                    </button>
-                  </div>
-                ))}
-                <button
-                  type="button"
-                  onClick={() =>
-                    setForm((current) => ({ ...current, bullets: [...current.bullets, ""] }))
-                  }
-                  className="inline-flex items-center gap-1 rounded-md border border-oxfordBlue bg-black px-3 py-1.5 text-xs text-platinum hover:text-orangeWeb"
-                >
-                  <Plus className="h-3.5 w-3.5" aria-hidden="true" />
-                  Add bullet
-                </button>
-              </div>
-            </div>
-
-            <div className="md:col-span-2">
-              <label className="mb-2 block text-sm font-medium text-platinum">Tags</label>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={form.tagInput}
-                  onChange={(event) =>
-                    setForm((current) => ({ ...current, tagInput: event.target.value }))
-                  }
-                  className="w-full rounded-md border border-oxfordBlue bg-black px-3 py-2 text-platinum outline-none focus:border-orangeWeb"
-                  placeholder="Type tag and click Add"
-                />
-                <button
-                  type="button"
-                  onClick={handleAddTag}
-                  className="rounded-md bg-orangeWeb px-3 py-2 text-xs font-semibold text-black"
-                >
-                  Add
-                </button>
-              </div>
-              <div className="mt-2 flex flex-wrap gap-2">
-                {form.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="inline-flex items-center gap-1 rounded-full bg-black px-2.5 py-1 text-xs text-platinum"
-                  >
-                    {tag}
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setForm((current) => ({
-                          ...current,
-                          tags: current.tags.filter((item) => item !== tag),
-                        }))
-                      }
-                      className="text-platinum/70 hover:text-orangeWeb"
-                    >
-                      <X className="h-3 w-3" aria-hidden="true" />
-                    </button>
-                  </span>
-                ))}
-              </div>
-            </div>
-
+            {/* Live URL */}
             <div>
               <label className="mb-2 block text-sm font-medium text-platinum">Live URL</label>
               <input
                 type="url"
                 value={form.liveUrl}
-                onChange={(event) => setForm((current) => ({ ...current, liveUrl: event.target.value }))}
+                onChange={(e) => setForm((c) => ({ ...c, liveUrl: e.target.value }))}
                 className="w-full rounded-md border border-oxfordBlue bg-black px-3 py-2 text-platinum outline-none focus:border-orangeWeb"
+                placeholder="https://example.com"
               />
             </div>
 
+            {/* GitHub URL */}
             <div>
               <label className="mb-2 block text-sm font-medium text-platinum">GitHub URL</label>
               <input
                 type="url"
                 value={form.githubUrl}
-                onChange={(event) =>
-                  setForm((current) => ({ ...current, githubUrl: event.target.value }))
-                }
+                onChange={(e) => setForm((c) => ({ ...c, githubUrl: e.target.value }))}
                 className="w-full rounded-md border border-oxfordBlue bg-black px-3 py-2 text-platinum outline-none focus:border-orangeWeb"
+                placeholder="https://github.com/..."
               />
             </div>
 
+            {/* Badge */}
             <div>
-              <label className="mb-2 block text-sm font-medium text-platinum">Badge</label>
+              <label className="mb-2 block text-sm font-medium text-platinum">Badge (optional)</label>
               <input
                 type="text"
                 value={form.badge}
-                onChange={(event) => setForm((current) => ({ ...current, badge: event.target.value }))}
-                placeholder="1st Place — Hackfest × Datathon 2026"
+                onChange={(e) => setForm((c) => ({ ...c, badge: e.target.value }))}
                 className="w-full rounded-md border border-oxfordBlue bg-black px-3 py-2 text-platinum outline-none focus:border-orangeWeb"
+                placeholder="1st Place — Hackfest 2026"
               />
-              <p className="mt-2 text-sm text-platinum/70">
-                Emoji are removed automatically. Use plain badge text only.
-              </p>
+              <p className="mt-1 text-xs text-platinum/60">Emoji are removed automatically.</p>
             </div>
 
+            {/* Order */}
             <div>
-              <label className="mb-2 block text-sm font-medium text-platinum">Image Fit</label>
-              <select
-                value={form.imageFit}
-                onChange={(event) =>
-                  setForm((current) => ({
-                    ...current,
-                    imageFit: event.target.value as "cover" | "contain",
-                  }))
-                }
-                className="w-full rounded-md border border-oxfordBlue bg-black px-3 py-2 text-platinum outline-none focus:border-orangeWeb"
-              >
-                <option value="cover">Cover</option>
-                <option value="contain">Contain</option>
-              </select>
-              <p className="mt-2 text-sm text-platinum/70">
-                Controls how images render on the live project card.
-              </p>
-            </div>
-
-            <div>
-              <label className="mb-2 block text-sm font-medium text-platinum">Order</label>
+              <label className="mb-2 block text-sm font-medium text-platinum">Display Order</label>
               <input
                 type="number"
                 value={form.order}
-                onChange={(event) =>
-                  setForm((current) => ({ ...current, order: Number(event.target.value) || 0 }))
-                }
+                onChange={(e) => setForm((c) => ({ ...c, order: Number(e.target.value) || 0 }))}
                 className="w-full rounded-md border border-oxfordBlue bg-black px-3 py-2 text-platinum outline-none focus:border-orangeWeb"
               />
             </div>
 
-            <div className="md:col-span-2 flex items-center gap-2">
-              <input
-                id="featured"
-                type="checkbox"
-                checked={form.featured}
-                onChange={(event) =>
-                  setForm((current) => ({ ...current, featured: event.target.checked }))
-                }
-                className="h-4 w-4 rounded border-oxfordBlue bg-black text-orangeWeb"
-              />
-              <label htmlFor="featured" className="text-sm text-platinum">
-                Mark as featured project
-              </label>
-            </div>
-
-            <div className="md:col-span-2">
+            {/* Images */}
+            <div>
               <label className="mb-2 block text-sm font-medium text-platinum">Images</label>
               <input
                 type="file"
                 multiple
-                accept="image/jpeg,image/png,image/webp,image/avif,image/gif,image/svg+xml"
-                onChange={(event) => {
-                  const selected = Array.from(event.target.files ?? []);
-                  setForm((current) => ({
-                    ...current,
-                    newImages: [...current.newImages, ...selected],
-                  }));
+                accept="image/*"
+                onChange={(e) => {
+                  const files = Array.from(e.target.files ?? []);
+                  setForm((c) => ({ ...c, newImages: [...c.newImages, ...files] }));
                 }}
                 className="w-full rounded-md border border-oxfordBlue bg-black px-3 py-2 text-sm text-platinum outline-none file:mr-3 file:rounded file:border-0 file:bg-orangeWeb file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-black"
               />
-              <p className="mt-2 text-xs text-platinum/70">
-                Supported formats: JPG, PNG, WebP, AVIF, GIF, SVG.
-              </p>
+              <p className="mt-1 text-xs text-platinum/60">Select one or more images.</p>
 
-              <div className="mt-4 rounded-lg border border-oxfordBlue bg-black/35 p-4">
-                <div className="mb-3 flex flex-wrap items-end gap-3">
-                  <div>
-                    <label className="mb-1 block text-xs font-medium uppercase tracking-[0.18em] text-platinum/60">
-                      Preview Mode
-                    </label>
-                    <select
-                      value={previewMode}
-                      onChange={(event) => setPreviewMode(event.target.value as PreviewMode)}
-                      className="rounded-md border border-oxfordBlue bg-black px-3 py-2 text-sm text-platinum outline-none focus:border-orangeWeb"
-                    >
-                      <option value="website">Match website</option>
-                      <option value="custom">Custom box</option>
-                    </select>
-                  </div>
-
-                  {previewMode === "custom" ? (
-                    <>
-                      <div>
-                        <label className="mb-1 block text-xs font-medium uppercase tracking-[0.18em] text-platinum/60">
-                          Preview Width
-                        </label>
-                        <input
-                          type="number"
-                          min={120}
-                          max={1400}
-                          value={previewWidth}
-                          onChange={(event) =>
-                            setPreviewWidth(Math.max(120, Number(event.target.value) || 120))
-                          }
-                          className="w-28 rounded-md border border-oxfordBlue bg-black px-3 py-2 text-sm text-platinum outline-none focus:border-orangeWeb"
-                        />
-                      </div>
-                      <div>
-                        <label className="mb-1 block text-xs font-medium uppercase tracking-[0.18em] text-platinum/60">
-                          Preview Height
-                        </label>
-                        <input
-                          type="number"
-                          min={80}
-                          max={900}
-                          value={previewHeight}
-                          onChange={(event) =>
-                            setPreviewHeight(Math.max(80, Number(event.target.value) || 80))
-                          }
-                          className="w-28 rounded-md border border-oxfordBlue bg-black px-3 py-2 text-sm text-platinum outline-none focus:border-orangeWeb"
-                        />
-                      </div>
-                      <div>
-                        <label className="mb-1 block text-xs font-medium uppercase tracking-[0.18em] text-platinum/60">
-                          Fit Mode
-                        </label>
-                        <select
-                          value={previewFit}
-                          onChange={(event) =>
-                            setPreviewFit(event.target.value as "cover" | "contain")
-                          }
-                          className="rounded-md border border-oxfordBlue bg-black px-3 py-2 text-sm text-platinum outline-none focus:border-orangeWeb"
-                        >
-                          <option value="cover">Cover</option>
-                          <option value="contain">Contain</option>
-                        </select>
-                      </div>
-                    </>
-                  ) : null}
-                </div>
-
-                <p className="mb-2 text-xs text-platinum/70">
-                  {previewMode === "website"
-                    ? "This preview uses the same project card image treatment as the live website."
-                    : "Live render preview using current dimensions and fit mode."}
-                </p>
-
-                <div className="overflow-auto rounded-md border border-oxfordBlue/70 bg-black/50 p-3">
-                  {previewMode === "website" ? (
-                    <div className="max-w-xl">
-                      <div className="group flex h-full flex-col overflow-hidden rounded-lg border border-platinum/10 bg-black p-6">
-                        <div className="-mx-6 -mt-6 mb-6">
-                          <div className="relative aspect-video w-full overflow-hidden rounded-t-lg bg-black">
-                            {primaryPreviewImage ? (
-                              isSvgImage(primaryPreviewImage) ? (
-                                <img
-                                  src={primaryPreviewImage}
-                                  alt="Website project image preview"
-                                  className={`h-full w-full ${form.imageFit === "contain" ? "object-contain" : "object-cover"}`}
-                                />
-                              ) : (
-                                <img
-                                  src={primaryPreviewImage}
-                                  alt="Website project image preview"
-                                  className={`h-full w-full ${form.imageFit === "contain" ? "object-contain" : "object-cover"}`}
-                                />
-                              )
-                            ) : (
-                              <div className="flex h-full w-full items-center justify-center text-sm text-platinum/60">
-                                Select at least one image to preview.
-                              </div>
-                            )}
-                          </div>
-                        </div>
-
-                        <h4 className="font-heading text-2xl font-semibold text-white transition-colors">
-                          {form.title || "Project title preview"}
-                        </h4>
-                        <p className="mt-3 text-base text-platinum/85">
-                          {(form.description || "Project description preview").slice(0, 160)}
-                        </p>
-                      </div>
-                    </div>
-                  ) : (
-                    <div
-                      className="relative overflow-hidden rounded-md border border-oxfordBlue/80 bg-black"
-                      style={{ width: `${previewWidth}px`, height: `${previewHeight}px` }}
-                    >
-                      {primaryPreviewImage ? (
-                        <img
-                          src={primaryPreviewImage}
-                          alt="Project display preview"
-                          className={`h-full w-full ${previewFit === "contain" ? "object-contain" : "object-cover"}`}
-                        />
-                      ) : (
-                        <div className="flex h-full w-full items-center justify-center text-sm text-platinum/60">
-                          Select at least one image to preview.
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {form.existingImages.length > 0 ? (
+              {/* Existing Images */}
+              {form.existingImages.length > 0 && (
                 <div className="mt-3">
-                  <p className="text-xs text-platinum/80">Existing images</p>
-                  <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                  <p className="mb-2 text-xs text-platinum/70">Current images:</p>
+                  <div className="flex flex-wrap gap-2">
                     {form.existingImages.map((url) => (
-                      <div key={url} className="relative overflow-hidden rounded-md border border-oxfordBlue">
-                        <img src={url} alt="Existing project" className="h-20 w-full object-cover" />
+                      <div key={url} className="relative h-16 w-16 overflow-hidden rounded-md border border-oxfordBlue/50">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={url} alt="existing" className="h-full w-full object-cover" />
                         <button
                           type="button"
                           onClick={() =>
-                            setForm((current) => ({
-                              ...current,
-                              existingImages: current.existingImages.filter((item) => item !== url),
+                            setForm((c) => ({
+                              ...c,
+                              existingImages: c.existingImages.filter((img) => img !== url),
                             }))
                           }
-                          className="absolute right-1 top-1 rounded bg-black/80 p-1 text-platinum hover:text-orangeWeb"
+                          className="absolute right-0 top-0 flex h-5 w-5 items-center justify-center bg-red-500/90 text-white"
                         >
-                          <X className="h-3.5 w-3.5" aria-hidden="true" />
+                          <X className="h-3 w-3" aria-hidden="true" />
                         </button>
                       </div>
                     ))}
                   </div>
                 </div>
-              ) : null}
+              )}
 
-              {newImagePreviews.length > 0 ? (
+              {/* New Images Preview */}
+              {newImagePreviews.length > 0 && (
                 <div className="mt-3">
-                  <p className="text-xs text-platinum/80">New image previews</p>
-                  <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
-                    {newImagePreviews.map(({ file, src }) => (
-                      <div
-                        key={`${file.name}-${file.lastModified}`}
-                        className="relative overflow-hidden rounded-md border border-oxfordBlue"
-                      >
-                        <img src={src} alt={file.name} className="h-20 w-full object-cover" />
+                  <p className="mb-2 text-xs text-platinum/70">New images ({newImagePreviews.length}):</p>
+                  <div className="flex flex-wrap gap-2">
+                    {newImagePreviews.map(({ file, src }, idx) => (
+                      <div key={`${file.name}-${idx}`} className="relative h-16 w-16 overflow-hidden rounded-md border border-orangeWeb/50">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={src} alt={file.name} className="h-full w-full object-cover" />
                         <button
                           type="button"
                           onClick={() =>
-                            setForm((current) => ({
-                              ...current,
-                              newImages: current.newImages.filter(
-                                (item) =>
-                                  !(
-                                    item.name === file.name &&
-                                    item.lastModified === file.lastModified &&
-                                    item.size === file.size
-                                  )
-                              ),
+                            setForm((c) => ({
+                              ...c,
+                              newImages: c.newImages.filter((f) => f !== file),
                             }))
                           }
-                          className="absolute right-1 top-1 rounded bg-black/80 p-1 text-platinum hover:text-orangeWeb"
+                          className="absolute right-0 top-0 flex h-5 w-5 items-center justify-center bg-red-500/90 text-white"
                         >
-                          <X className="h-3.5 w-3.5" aria-hidden="true" />
+                          <X className="h-3 w-3" aria-hidden="true" />
                         </button>
                       </div>
                     ))}
                   </div>
                 </div>
-              ) : null}
+              )}
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
-            <LoadingButton
-              onClick={() => void handleSubmit()}
-              loading={isSubmitting}
-              loadingText="Saving..."
-              className="inline-flex items-center gap-2 rounded-md bg-orangeWeb px-4 py-2 text-sm font-semibold text-black transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-70"
+          {/* Buttons */}
+          <div className="flex gap-2 border-t border-oxfordBlue/50 pt-4">
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="inline-flex items-center gap-2 rounded-md bg-orangeWeb px-4 py-2 text-sm font-semibold text-black transition-opacity hover:opacity-90 disabled:opacity-50"
             >
-              {editingId ? "Update Project" : "Create Project"}
-            </LoadingButton>
+              <Plus className="h-4 w-4" aria-hidden="true" />
+              {isSubmitting ? "Saving..." : editingId ? "Update" : "Create"}
+            </button>
             <button
               type="button"
               onClick={cancelForm}
-              className="rounded-md border border-oxfordBlue bg-black px-4 py-2 text-sm font-medium text-platinum hover:text-orangeWeb"
+              className="rounded-md border border-oxfordBlue px-4 py-2 text-sm font-semibold text-platinum transition-colors hover:border-orangeWeb hover:text-orangeWeb"
             >
               Cancel
             </button>
           </div>
-        </div>
+        </form>
       )}
 
-      <ConfirmModal
-        isOpen={Boolean(projectToDelete)}
-        title="Delete project"
-        message="Delete this project and all uploaded images? This action cannot be undone."
-        onConfirm={() => void confirmDelete()}
-        onCancel={() => setProjectToDelete(null)}
-      />
+      {toast && (
+        <Toast toast={toast} onClose={hideToast} />
+      )}
 
-      {toast ? <Toast toast={toast} onClose={hideToast} /> : null}
+      {projectToDelete && (
+        <ConfirmModal
+          isOpen={Boolean(projectToDelete)}
+          title="Delete Project"
+          message="Are you sure you want to delete this project? This cannot be undone."
+          onConfirm={() => void confirmDelete()}
+          onCancel={() => setProjectToDelete(null)}
+        />
+      )}
     </section>
   );
 }
