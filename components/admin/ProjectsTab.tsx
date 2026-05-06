@@ -17,6 +17,7 @@ interface ProjectFormState {
   githubUrl: string;
   badge: string;
   order: number;
+  imageFit: "cover" | "contain";
   existingImages: string[];
   newImages: File[];
 }
@@ -27,6 +28,7 @@ const initialFormState: ProjectFormState = {
   githubUrl: "",
   badge: "",
   order: 0,
+  imageFit: "cover",
   existingImages: [],
   newImages: [],
 };
@@ -43,6 +45,7 @@ function toFormState(project: IProject): ProjectFormState {
     githubUrl: project.githubUrl ?? "",
     badge: project.badge ?? "",
     order: project.order,
+    imageFit: project.imageFit ?? "cover",
     existingImages: project.images,
     newImages: [],
   };
@@ -54,7 +57,7 @@ function buildSubmitPayload(form: ProjectFormState): FormData {
   payload.set("description", form.title); // Use title as description fallback
   payload.set("bullets", JSON.stringify([]));
   payload.set("tags", JSON.stringify([]));
-  payload.set("imageFit", "cover");
+  payload.set("imageFit", form.imageFit);
   payload.set("liveUrl", form.liveUrl);
   payload.set("githubUrl", form.githubUrl);
   payload.set("badge", form.badge);
@@ -322,6 +325,27 @@ export default function ProjectsTab({ projects }: ProjectsTabProps) {
                 placeholder="1st Place — Hackfest 2026"
               />
               <p className="mt-1 text-xs text-platinum/60">Emoji are removed automatically.</p>
+            </div>
+
+            {/* Image Fit */}
+            <div>
+              <label className="mb-2 block text-sm font-medium text-platinum">Image Fit</label>
+              <select
+                value={form.imageFit}
+                onChange={(e) =>
+                  setForm((c) => ({
+                    ...c,
+                    imageFit: e.target.value as "cover" | "contain",
+                  }))
+                }
+                className="w-full rounded-md border border-oxfordBlue bg-black px-3 py-2 text-platinum outline-none focus:border-orangeWeb"
+              >
+                <option value="cover">Cover (fill, may crop)</option>
+                <option value="contain">Contain (fit entire image)</option>
+              </select>
+              <p className="mt-1 text-xs text-platinum/60">
+                Cover crops to fit. Contain shows the full image with padding.
+              </p>
             </div>
 
             {/* Order */}
