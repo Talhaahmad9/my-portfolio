@@ -4,7 +4,7 @@ export const typography = {
   heroName:
     "font-heading whitespace-nowrap text-5xl font-semibold leading-none tracking-tight text-white sm:text-8xl",
   heroRole:
-    "font-heading text-4xl font-semibold tracking-tight text-platinum/70 sm:text-6xl lg:text-7xl",
+    "font-heading whitespace-nowrap text-2xl font-semibold tracking-tight text-platinum/70 sm:text-6xl lg:text-7xl",
   sectionEyebrow:
     "font-heading text-sm font-medium uppercase tracking-[0.22em] text-orangeWeb sm:text-base",
   sectionTitle:

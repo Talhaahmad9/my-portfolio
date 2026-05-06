@@ -140,7 +140,10 @@ export default function ContentTab({ config }: ContentTabProps) {
   const [heroLoading, setHeroLoading] = useState(false);
 
   // ── About state ─────────────────────────────────────────────────────────────
+  const [heading, setHeading] = useState(config.about.heading);
   const [bio, setBio] = useState(config.about.bio);
+  const [bullets, setBullets] = useState<string[]>(config.about.bullets);
+  const [newBullet, setNewBullet] = useState("");
   const [certs, setCerts] = useState<CertForm[]>(
     config.about.certifications.map(certificationToForm)
   );
@@ -198,8 +201,11 @@ export default function ContentTab({ config }: ContentTabProps) {
   // ── About handlers ──────────────────────────────────────────────────────────
 
   const handleAboutSave = async () => {
+    const normalizedBullets = bullets.map((bullet) => bullet.trim()).filter(Boolean);
     const payload = new FormData();
+    payload.set("heading", heading);
     payload.set("bio", bio);
+    payload.set("bullets", JSON.stringify(normalizedBullets));
     payload.set(
       "certifications",
       JSON.stringify(
@@ -224,13 +230,36 @@ export default function ContentTab({ config }: ContentTabProps) {
     setAboutLoading(false);
     if (result.success) {
       if (result.data) {
+        setHeading(result.data.heading);
         setBio(result.data.bio);
+        setBullets(result.data.bullets);
         setCerts(result.data.certifications.map(certificationToForm));
       }
       showToast("About section saved.", "success");
     } else {
       showToast(result.error ?? "Failed to save about.", "error");
     }
+  };
+
+  const addBullet = () => {
+    const trimmed = newBullet.trim();
+    if (!trimmed) return;
+    setBullets((prev) => [...prev, trimmed]);
+    setNewBullet("");
+  };
+
+  const removeBullet = (index: number) => {
+    setBullets((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const moveBullet = (index: number, direction: "up" | "down") => {
+    setBullets((prev) => {
+      const targetIndex = direction === "up" ? index - 1 : index + 1;
+      if (targetIndex < 0 || targetIndex >= prev.length) return prev;
+      const next = [...prev];
+      [next[index], next[targetIndex]] = [next[targetIndex]!, next[index]!];
+      return next;
+    });
   };
 
   const addCert = () => setCerts((prev) => [...prev, blankCert()]);
@@ -557,6 +586,21 @@ export default function ContentTab({ config }: ContentTabProps) {
       {/* ── About & Bio ───────────────────────────────────────────────────── */}
       {activeSection === "about" && (
         <div className="space-y-6 max-w-2xl">
+          {/* Heading */}
+          <div>
+            <label className="mb-1.5 block text-sm font-medium text-white">Heading</label>
+            <input
+              type="text"
+              value={heading}
+              onChange={(e) => setHeading(e.target.value)}
+              placeholder="e.g. Full-Stack Developer"
+              className="w-full rounded-md border border-platinum/20 bg-oxfordBlue px-3 py-2 text-sm text-white placeholder:text-platinum/50 focus:outline-none focus:ring-1 focus:ring-orangeWeb"
+            />
+            <p className="mt-2 text-xs text-platinum/60">
+              If left empty, the public section falls back to the default heading.
+            </p>
+          </div>
+
           {/* Bio */}
           <div>
             <label className="mb-1.5 block text-sm font-medium text-white">Bio</label>
@@ -569,6 +613,71 @@ export default function ContentTab({ config }: ContentTabProps) {
               rows={10}
               className="w-full rounded-md border border-platinum/20 bg-oxfordBlue px-3 py-2 text-sm text-white placeholder:text-platinum/50 focus:outline-none focus:ring-1 focus:ring-orangeWeb"
             />
+          </div>
+
+          {/* Bullets */}
+          <div>
+            <div className="mb-2 flex items-center justify-between">
+              <label className="text-sm font-medium text-white">About Bullets</label>
+            </div>
+            <p className="mb-3 text-xs text-platinum/60">
+              Add short highlights and reorder them before saving.
+            </p>
+
+            <div className="space-y-2">
+              {bullets.map((bullet, i) => (
+                <div
+                  key={`${bullet}-${i}`}
+                  className="flex items-center gap-2 rounded-md border border-platinum/10 bg-oxfordBlue px-3 py-2"
+                >
+                  <span className="flex-1 text-sm text-platinum">{bullet}</span>
+                  <button
+                    type="button"
+                    onClick={() => moveBullet(i, "up")}
+                    disabled={i === 0}
+                    className="p-1.5 text-platinum hover:text-white disabled:opacity-30"
+                    aria-label={`Move bullet ${i + 1} up`}
+                  >
+                    <ChevronUp className="h-4 w-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => moveBullet(i, "down")}
+                    disabled={i === bullets.length - 1}
+                    className="p-1.5 text-platinum hover:text-white disabled:opacity-30"
+                    aria-label={`Move bullet ${i + 1} down`}
+                  >
+                    <ChevronDown className="h-4 w-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => removeBullet(i)}
+                    className="p-1.5 text-platinum hover:text-orangeWeb"
+                    aria-label={`Remove bullet ${i + 1}`}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-3 flex gap-2">
+              <input
+                type="text"
+                placeholder="Add a bullet point..."
+                value={newBullet}
+                onChange={(e) => setNewBullet(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && addBullet()}
+                className="flex-1 rounded-md border border-platinum/20 bg-oxfordBlue px-3 py-2 text-sm text-white placeholder:text-platinum/50 focus:outline-none focus:ring-1 focus:ring-orangeWeb"
+              />
+              <button
+                type="button"
+                onClick={addBullet}
+                className="rounded-md border border-platinum/20 bg-oxfordBlue px-3 py-2 text-platinum hover:text-white"
+              >
+                <Plus className="h-4 w-4" />
+              </button>
+            </div>
           </div>
 
           {/* Certifications */}

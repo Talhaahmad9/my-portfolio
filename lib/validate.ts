@@ -74,7 +74,9 @@ export const heroConfigSchema = z.object({
 });
 
 export const aboutConfigSchema = z.object({
+  heading: z.string().max(120, "Heading is too long"),
   bio: z.string().min(1, "Bio is required"),
+  bullets: z.array(z.string().min(1, "Bullet cannot be empty").max(180, "Bullet is too long")).max(10, "Too many bullets"),
   certifications: z.array(certificationSchema),
 });
 

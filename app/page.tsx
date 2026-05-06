@@ -29,7 +29,9 @@ export default async function Home() {
           typewriterStrings={siteConfig.hero.typewriterStrings}
         />
         <AboutSection
+          heading={siteConfig.about.heading}
           bio={siteConfig.about.bio}
+          bullets={siteConfig.about.bullets}
           achievements={siteConfig.about.achievements}
           skills={siteConfig.about.skills}
         />

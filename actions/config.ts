@@ -34,7 +34,9 @@ export interface SiteConfigPlain {
     typewriterStrings: string[];
   };
   about: {
+    heading: string;
     bio: string;
+    bullets: string[];
     achievements: IAchievement[];
     skills: ISkillGroup[];
     certifications: ICertification[];
@@ -130,7 +132,11 @@ export async function getSiteConfig(): Promise<SiteConfigPlain> {
       JSON.stringify({
         hero: doc.hero,
         about: {
-          ...doc.about,
+          heading: doc.about?.heading ?? DEFAULT_SITE_CONFIG.about.heading,
+          bio: doc.about?.bio ?? DEFAULT_SITE_CONFIG.about.bio,
+          bullets: doc.about?.bullets ?? DEFAULT_SITE_CONFIG.about.bullets,
+          achievements: doc.about?.achievements ?? DEFAULT_SITE_CONFIG.about.achievements,
+          skills: doc.about?.skills ?? DEFAULT_SITE_CONFIG.about.skills,
           certifications,
         },
       })
@@ -176,7 +182,7 @@ export async function updateHero(
   return { success: true, data: clean };
 }
 
-// ─── About (bio + certifications) ────────────────────────────────────────────
+// ─── About (heading + bio + bullets + certifications) ───────────────────────
 
 export async function updateAbout(
   data: FormData
@@ -184,22 +190,33 @@ export async function updateAbout(
   const session = await auth();
   if (!session) return { success: false, error: "Unauthorized" };
 
+  const heading = data.get("heading");
   const bio = data.get("bio");
+  const bulletsRaw = data.get("bullets");
   const certificationsRaw = data.get("certifications");
 
-  if (typeof bio !== "string" || typeof certificationsRaw !== "string") {
+  if (
+    typeof heading !== "string" ||
+    typeof bio !== "string" ||
+    typeof bulletsRaw !== "string" ||
+    typeof certificationsRaw !== "string"
+  ) {
     return { success: false, error: "Invalid form payload" };
   }
 
+  let bulletsData: unknown;
   let certificationsData: unknown;
   try {
+    bulletsData = JSON.parse(bulletsRaw);
     certificationsData = JSON.parse(certificationsRaw);
   } catch {
-    return { success: false, error: "Invalid certificate data" };
+    return { success: false, error: "Invalid form data" };
   }
 
   const parsed = aboutConfigSchema.safeParse({
+    heading,
     bio,
+    bullets: bulletsData,
     certifications: certificationsData,
   });
   if (!parsed.success) {
@@ -257,13 +274,22 @@ export async function updateAbout(
   }
 
   const clean = sanitizeObject({
+    heading: parsed.data.heading,
     bio: parsed.data.bio,
+    bullets: parsed.data.bullets,
     certifications: preparedCertifications,
   });
 
   await SiteConfigModel.findOneAndUpdate(
     { key: "main" },
-    { $set: { "about.bio": clean.bio, "about.certifications": clean.certifications } },
+    {
+      $set: {
+        "about.heading": clean.heading,
+        "about.bio": clean.bio,
+        "about.bullets": clean.bullets,
+        "about.certifications": clean.certifications,
+      },
+    },
     { upsert: true }
   );
 
@@ -282,7 +308,9 @@ export async function updateAbout(
   return {
     success: true,
     data: {
+      heading: clean.heading,
       bio: clean.bio,
+      bullets: clean.bullets,
       achievements: decodeLegacyEscapedContent(
         JSON.parse(JSON.stringify(existingDoc?.about?.achievements ?? DEFAULT_SITE_CONFIG.about.achievements))
       ) as IAchievement[],

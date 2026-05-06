@@ -34,7 +34,9 @@ export interface ISiteConfig extends Document {
     typewriterStrings: string[];
   };
   about: {
+    heading: string;
     bio: string;
+    bullets: string[];
     achievements: IAchievement[];
     skills: ISkillGroup[];
     certifications: ICertification[];
@@ -95,9 +97,17 @@ const SiteConfigSchema = new Schema<ISiteConfig>({
     },
   },
   about: {
+    heading: {
+      type: String,
+      default: "Full-Stack Developer",
+    },
     bio: {
       type: String,
       default: "",
+    },
+    bullets: {
+      type: [String],
+      default: [],
     },
     achievements: { type: [AchievementSchema], default: [] },
     skills: { type: [SkillGroupSchema], default: [] },
@@ -132,7 +142,9 @@ export const DEFAULT_SITE_CONFIG = {
     ],
   },
   about: {
+    heading: "Full-Stack Developer",
     bio: `I'm Talha Ahmad — a Full Stack Developer and GenAI Specialist, and Computer Science student at the Institute of Business Management (IoBM), Karachi, expected to graduate in 2027.\n\nI build production-grade web applications and intelligent AI systems end-to-end — from fine-tuned LLM pipelines to fully-deployed Next.js products. My current focus is AI agent architecture and LLM orchestration, with a growing body of work in multi-agent GenAI frameworks.\n\nMost recently, I won 1st place at Hackfest × Datathon 2026 hosted by IBA Karachi — building a multi-agent narrative simulation engine using LangGraph and Google Gemini 2.0 Flash, scoring 88/100 against teams from leading Pakistani universities.\n\nI'm open to remote roles in AI engineering, full-stack development, or GenAI product teams.`,
+    bullets: [],
     achievements: [
       {
         title: "Hackfest × Datathon 2026",

@@ -6,7 +6,9 @@ import type { IAchievement, ISkillGroup } from "@/lib/db/models/SiteConfig";
 // ─── Props ────────────────────────────────────────────────────────────────────
 
 interface AboutSectionProps {
+  heading: string;
   bio: string;
+  bullets: string[];
   achievements: IAchievement[];
   skills: ISkillGroup[];
 }
@@ -14,10 +16,13 @@ interface AboutSectionProps {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function AboutSection({
+  heading,
   bio,
+  bullets,
   achievements,
   skills,
 }: AboutSectionProps) {
+  const aboutHeading = heading.trim() || "Full-Stack Developer";
   const bioParagraphs = bio
     .split(/\n+/)
     .map((p) => p.trim())
@@ -31,9 +36,7 @@ export default function AboutSection({
         {/* Section heading */}
         <SectionItem>
           <p className={`mb-2 ${typography.sectionEyebrow}`}>About Me</p>
-          <h2 className={typography.sectionTitle}>
-            Full Stack Developer &amp; GenAI Specialist
-          </h2>
+          <h2 className={typography.sectionTitle}>{aboutHeading}</h2>
         </SectionItem>
 
         {/* Two-column: bio left, achievement card right */}
@@ -45,6 +48,13 @@ export default function AboutSection({
               {bioParagraphs.map((paragraph, i) => (
                 <p key={i}>{paragraph}</p>
               ))}
+              {bullets.length > 0 && (
+                <ul className="space-y-2 pl-5 text-platinum marker:text-orangeWeb">
+                  {bullets.map((bullet, i) => (
+                    <li key={`${bullet}-${i}`}>{bullet}</li>
+                  ))}
+                </ul>
+              )}
             </div>
           </SectionItem>
 

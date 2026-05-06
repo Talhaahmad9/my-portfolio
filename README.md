@@ -42,6 +42,7 @@ Most portfolio sites become outdated because content updates require direct code
 This project solves that by introducing a secure CMS-like admin experience where Talha can:
 
 1. Update Hero and About content.
+2. Manage About section heading and custom bullet highlights.
 2. Add, edit, reorder, and delete projects.
 3. Manage hall-of-fame wins.
 4. Upload and switch active resumes.
@@ -70,7 +71,7 @@ Everything on the public site is sourced dynamically from MongoDB, so content ch
 | Route | Purpose |
 |---|---|
 | /admin | Secure login for admin |
-| /admin/dashboard/content | Edit Hero and About content, including achievement ordering, certificate ordering, and certificate image uploads |
+| /admin/dashboard/content | Edit Hero and About content, including About heading, About bullets, achievement ordering, certificate ordering, and certificate image uploads |
 | /admin/dashboard/projects | Full project CRUD and ordering |
 | /admin/dashboard/wins | Add/remove wins |
 | /admin/dashboard/resume | Upload, activate, and delete resumes |
@@ -91,7 +92,9 @@ Everything on the public site is sourced dynamically from MongoDB, so content ch
 | SEO foundation | Metadata API, JSON-LD Person schema, Open Graph, sitemap, robots |
 | Animation system | Shared SectionWrapper and SectionItem reveal pattern |
 | Achievement storytelling | About section supports multiple achievements with slideshow controls and admin-managed ordering |
+| About content controls | About heading and bullet highlights are CMS-managed with add/remove/reorder controls |
 | Ambient interaction | Cursor glow now supports desktop pointer movement and active mobile touch interaction |
+| Hero mobile readability | Hero typewriter role line uses tighter mobile typography to keep the line stable under the name |
 
 ---
 
@@ -220,6 +223,7 @@ Collections used:
 5. `about.achievements` is an ordered array, and that order drives the public slideshow sequence.
 6. `about.certifications` can now carry opaque public IDs and R2-backed image URLs for shareable certificate pages.
 7. `about.certifications` array order is managed in admin and directly controls public certificate order in both grid and slideshow modes.
+8. `about.heading` and `about.bullets` are editable from admin content controls and rendered on the public About section.
 
 ---
 
