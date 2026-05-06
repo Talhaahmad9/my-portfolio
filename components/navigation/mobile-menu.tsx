@@ -8,6 +8,7 @@ import { typography } from "@/lib/typography";
 
 const navLinks = [
   { label: "About",    href: "#about"    },
+  { label: "Certificates", href: "#certifications" },
   { label: "Projects", href: "#projects" },
   { label: "Contact",  href: "#contact"  },
 ];

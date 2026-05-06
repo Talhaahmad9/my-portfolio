@@ -11,6 +11,7 @@ import MobileMenu from "./mobile-menu";
 
 const navLinks = [
   { label: "About",    href: "#about"    },
+  { label: "Certificates", href: "#certifications" },
   { label: "Projects", href: "#projects" },
   { label: "Contact",  href: "#contact"  },
 ];
