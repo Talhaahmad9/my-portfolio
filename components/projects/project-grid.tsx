@@ -1,11 +1,14 @@
 import SectionWrapper, { SectionItem } from "@/components/shared/section-wrapper";
 import ProjectCard from "./project-card";
+import ProjectShowcase from "./project-showcase";
 import { IProject } from "@/lib/db/models/Project";
 import { typography } from "@/lib/typography";
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function ProjectGrid({ projects }: { projects: IProject[] }) {
+  const useShowcase = projects.length >= 3;
+
   return (
     <SectionWrapper id="projects" className="bg-black/40 py-24 px-6">
       <div className="mx-auto max-w-6xl">
@@ -24,22 +27,28 @@ export default function ProjectGrid({ projects }: { projects: IProject[] }) {
           </p>
         </SectionItem>
 
-        {/* Cards */}
-        <div className="mt-12 grid gap-6 sm:grid-cols-2">
-          {projects.length === 0 ? (
+        {/* Projects */}
+        {projects.length === 0 ? (
+          <div className="mt-12 grid gap-6 sm:grid-cols-2">
             <SectionItem>
-              <div className="group flex h-full flex-col items-center justify-center rounded-lg border border-platinum/10 bg-black p-12 transition-colors hover:border-orangeWeb text-center">
+              <div className="group flex h-full flex-col items-center justify-center rounded-lg border border-platinum/10 bg-black p-12 text-center transition-colors hover:border-orangeWeb">
                 <p className="font-heading text-xl font-medium text-platinum">Projects coming soon</p>
               </div>
             </SectionItem>
-          ) : (
-            projects.map((project) => (
+          </div>
+        ) : useShowcase ? (
+          <SectionItem>
+            <ProjectShowcase projects={projects} />
+          </SectionItem>
+        ) : (
+          <div className="mt-12 grid gap-6 sm:grid-cols-2">
+            {projects.map((project) => (
               <SectionItem key={project._id ? String(project._id) : project.title}>
                 <ProjectCard project={project} />
               </SectionItem>
-            ))
-          )}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </SectionWrapper>
   );
