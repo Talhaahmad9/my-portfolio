@@ -51,7 +51,7 @@ function toFormState(project: IProject): ProjectFormState {
 function buildSubmitPayload(form: ProjectFormState): FormData {
   const payload = new FormData();
   payload.set("title", form.title);
-  payload.set("description", "");
+  payload.set("description", form.title); // Use title as description fallback
   payload.set("bullets", JSON.stringify([]));
   payload.set("tags", JSON.stringify([]));
   payload.set("imageFit", "cover");
@@ -80,12 +80,24 @@ export default function ProjectsTab({ projects }: ProjectsTabProps) {
   const [projectToDelete, setProjectToDelete] = useState<IProject | null>(null);
   const [form, setForm] = useState<ProjectFormState>(initialFormState);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [previewWidth, setPreviewWidth] = useState(640);
+  const [previewHeight, setPreviewHeight] = useState(360);
   const { toast, showToast, hideToast } = useToast();
 
   const newImagePreviews = useMemo(
     () => form.newImages.map((file) => ({ file, src: URL.createObjectURL(file) })),
     [form.newImages]
   );
+
+  const primaryImage = useMemo(() => {
+    if (newImagePreviews.length > 0) {
+      return newImagePreviews[0]?.src ?? null;
+    }
+    if (form.existingImages.length > 0) {
+      return form.existingImages[0] ?? null;
+    }
+    return null;
+  }, [newImagePreviews, form.existingImages]);
 
   const startCreate = (): void => {
     setEditingId(null);
@@ -388,6 +400,89 @@ export default function ProjectsTab({ projects }: ProjectsTabProps) {
                         </button>
                       </div>
                     ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Image Preview Viewer */}
+              {primaryImage && (
+                <div className="mt-4 rounded-lg border border-oxfordBlue bg-black/35 p-4">
+                  <div className="space-y-3">
+                    <p className="text-xs font-medium uppercase tracking-[0.18em] text-platinum/60">
+                      Live Preview
+                    </p>
+
+                    {/* Dimensions Controls */}
+                    <div className="flex flex-wrap gap-3">
+                      <div>
+                        <label className="mb-1 block text-xs font-medium text-platinum/70">Width</label>
+                        <div className="flex items-center gap-1">
+                          <input
+                            type="number"
+                            min={120}
+                            max={1400}
+                            value={previewWidth}
+                            onChange={(e) =>
+                              setPreviewWidth(Math.max(120, Number(e.target.value) || 120))
+                            }
+                            className="w-24 rounded-md border border-oxfordBlue bg-black px-2 py-1 text-sm text-platinum outline-none focus:border-orangeWeb"
+                          />
+                          <span className="text-xs text-platinum/60">px</span>
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="mb-1 block text-xs font-medium text-platinum/70">Height</label>
+                        <div className="flex items-center gap-1">
+                          <input
+                            type="number"
+                            min={80}
+                            max={900}
+                            value={previewHeight}
+                            onChange={(e) =>
+                              setPreviewHeight(Math.max(80, Number(e.target.value) || 80))
+                            }
+                            className="w-24 rounded-md border border-oxfordBlue bg-black px-2 py-1 text-sm text-platinum outline-none focus:border-orangeWeb"
+                          />
+                          <span className="text-xs text-platinum/60">px</span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-end gap-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setPreviewWidth(640);
+                            setPreviewHeight(360);
+                          }}
+                          className="rounded-md border border-platinum/20 bg-black px-2 py-1 text-xs font-medium text-platinum transition-colors hover:border-orangeWeb hover:text-orangeWeb"
+                        >
+                          Reset to 16:9
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Preview Box */}
+                    <div className="overflow-auto rounded-md border border-oxfordBlue/70 bg-black/50 p-2">
+                      <div
+                        className="mx-auto flex items-center justify-center rounded-md border border-platinum/10 bg-black overflow-hidden"
+                        style={{
+                          width: `${previewWidth}px`,
+                          height: `${previewHeight}px`,
+                        }}
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={primaryImage}
+                          alt="Preview"
+                          className="h-full w-full object-cover"
+                        />
+                      </div>
+                    </div>
+
+                    <p className="text-xs text-platinum/60">
+                      Dimensions: {previewWidth} × {previewHeight} px (Aspect ratio: {(previewWidth / previewHeight).toFixed(2)}:1)
+                    </p>
                   </div>
                 </div>
               )}
