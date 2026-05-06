@@ -1,5 +1,4 @@
 import mongoose, { Document, Model, Schema } from "mongoose";
-import { connectDB } from "@/lib/db/mongo";
 
 // ─── Sub-document interfaces ──────────────────────────────────────────────────
 
@@ -20,8 +19,10 @@ export interface ISkillGroup {
 }
 
 export interface ICertification {
+  publicId?: string;
   name: string;
   issuer: string;
+  imageUrl?: string;
 }
 
 // ─── Main interface ───────────────────────────────────────────────────────────
@@ -66,8 +67,10 @@ const SkillGroupSchema = new Schema<ISkillGroup>(
 
 const CertificationSchema = new Schema<ICertification>(
   {
+    publicId: { type: String },
     name: { type: String, required: true },
     issuer: { type: String, required: true },
+    imageUrl: { type: String },
   },
   { _id: false }
 );
@@ -174,14 +177,17 @@ export const DEFAULT_SITE_CONFIG = {
     ],
     certifications: [
       {
+        publicId: "cert_0f3c8e45a1b2d4e6c7f80911",
         name: "React – The Complete Guide (incl. Next.js, Redux)",
         issuer: "Udemy",
       },
       {
+        publicId: "cert_1a4d9f52b3c6e7d8f9011223",
         name: "CSS – The Complete Guide (incl. Flexbox, Grid & Sass)",
         issuer: "Udemy",
       },
       {
+        publicId: "cert_2b5e0a63c4d7f8e9a0122334",
         name: "The Complete Full-Stack Web Development Bootcamp",
         issuer: "Udemy",
       },

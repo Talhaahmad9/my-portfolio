@@ -60,8 +60,11 @@ export const skillGroupSchema = z.object({
 });
 
 export const certificationSchema = z.object({
+  publicId: z.string().min(1).optional(),
   name: z.string().min(1, "Name is required"),
   issuer: z.string().min(1, "Issuer is required"),
+  imageUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
+  removeImage: z.boolean().optional().default(false),
 });
 
 export const heroConfigSchema = z.object({

@@ -45,6 +45,7 @@ This project solves that by introducing a secure CMS-like admin experience where
 2. Add, edit, reorder, and delete projects.
 3. Manage hall-of-fame wins.
 4. Upload and switch active resumes.
+5. Upload certificate images and share them through dedicated public certificate pages.
 
 Everything on the public site is sourced dynamically from MongoDB, so content changes are fast and code-free.
 
@@ -57,17 +58,18 @@ Everything on the public site is sourced dynamically from MongoDB, so content ch
 | Area | What it does |
 |---|---|
 | Navbar + Hero | Identity, CTA actions, dynamic active CV link |
-| About | Bio, auto-playing achievements slideshow, skills, certifications (from SiteConfig) |
+| About | Bio, auto-playing achievements slideshow, skills, tappable certificate cards, certifications (from SiteConfig) |
 | Wins | Dynamic records from MongoDB |
 | Projects | Dynamic cards and image carousel from MongoDB + R2 |
 | Footer | Contact endpoints and profile links |
+| Certificate pages | Shareable direct-link certificate detail pages backed by opaque IDs |
 
 ### Admin side
 
 | Route | Purpose |
 |---|---|
 | /admin | Secure login for admin |
-| /admin/dashboard/content | Edit Hero and About content, including achievement slide ordering |
+| /admin/dashboard/content | Edit Hero and About content, including achievement slide ordering and certificate image uploads |
 | /admin/dashboard/projects | Full project CRUD and ordering |
 | /admin/dashboard/wins | Add/remove wins |
 | /admin/dashboard/resume | Upload, activate, and delete resumes |
@@ -82,10 +84,12 @@ Everything on the public site is sourced dynamically from MongoDB, so content ch
 | Secure admin auth | NextAuth v5 Credentials, protected dashboard routes |
 | Project media pipeline | Multi-image upload and deletion using Cloudflare R2 |
 | Resume management | Active resume switching reflected instantly in public CTAs |
+| Certificate media pipeline | Admin-managed certificate image uploads with preview, replacement, cleanup, and stable public share pages |
 | Input integrity | Zod validation + sanitization before DB writes |
 | SEO foundation | Metadata API, JSON-LD Person schema, Open Graph, sitemap, robots |
 | Animation system | Shared SectionWrapper and SectionItem reveal pattern |
 | Achievement storytelling | About section supports multiple achievements with slideshow controls and admin-managed ordering |
+| Ambient interaction | Cursor glow now supports desktop pointer movement and active mobile touch interaction |
 
 ---
 
@@ -154,6 +158,8 @@ portfolio/
 ├── app/
 │   ├── page.tsx
 │   ├── layout.tsx
+│   ├── certificates/
+│   │   └── [publicId]/page.tsx
 │   ├── robots.ts
 │   ├── sitemap.ts
 │   ├── admin/
@@ -210,12 +216,13 @@ Collections used:
 3. `resume` keeps exactly one active CV at a time.
 4. `siteconfigs` acts as a singleton content source for Hero and About sections.
 5. `about.achievements` is an ordered array, and that order drives the public slideshow sequence.
+6. `about.certifications` can now carry opaque public IDs and R2-backed image URLs for shareable certificate pages.
 
 ---
 
 ## Upload and Delivery Pipeline
 
-For project images and resume PDFs:
+For project images, certificate images, and resume PDFs:
 
 1. User selects file in admin UI.
 2. Client submits via form data to Server Action.
@@ -227,6 +234,8 @@ On delete:
 
 1. Object is removed from R2.
 2. Database reference is removed.
+
+Certificate links are routed through app pages rather than sharing raw storage URLs as the primary user entry point.
 
 ---
 
@@ -298,6 +307,7 @@ npm run seed
 3. Zod validation blocks malformed payloads.
 4. Plain text content is normalized before persistence and rendered through React text nodes instead of storing HTML entities.
 5. Storage credentials are server-only.
+6. Certificate detail pages use opaque `publicId` values and are intended for direct-link sharing rather than search discovery.
 
 ---
 
@@ -314,6 +324,8 @@ Recommended checks after deploy:
 2. Admin login redirects and protection rules work.
 3. Project image upload/delete works.
 4. Resume activate/deactivate flow works across Hero/Nav/Mobile Menu.
+5. Certificate image upload and replacement works from the content dashboard.
+6. Shared certificate URLs resolve correctly and remain excluded from indexing.
 
 ---
 

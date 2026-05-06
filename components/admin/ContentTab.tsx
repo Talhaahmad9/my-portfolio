@@ -1,9 +1,12 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 import {
   ChevronDown,
   ChevronUp,
+  ExternalLink,
+  ImagePlus,
   Plus,
   Trash2,
   X,
@@ -15,7 +18,7 @@ import {
   updateSkills,
 } from "@/actions/config";
 import type { SiteConfigPlain } from "@/actions/config";
-import type { IAchievement, ISkillGroup } from "@/lib/db/models/SiteConfig";
+import type { IAchievement, ICertification, ISkillGroup } from "@/lib/db/models/SiteConfig";
 import Toast from "@/components/admin/Toast";
 import ConfirmModal from "@/components/admin/ConfirmModal";
 import { useToast } from "@/components/admin/useToast";
@@ -91,8 +94,35 @@ function skillGroupToForm(g: ISkillGroup): SkillGroupForm {
 // ─── Cert form state ──────────────────────────────────────────────────────────
 
 interface CertForm {
+  publicId: string;
   name: string;
   issuer: string;
+  imageUrl: string;
+  newImage: File | null;
+  previewUrl: string | null;
+  removeImage: boolean;
+}
+
+const blankCert = (): CertForm => ({
+  publicId: "",
+  name: "",
+  issuer: "",
+  imageUrl: "",
+  newImage: null,
+  previewUrl: null,
+  removeImage: false,
+});
+
+function certificationToForm(certification: ICertification): CertForm {
+  return {
+    publicId: certification.publicId ?? "",
+    name: certification.name,
+    issuer: certification.issuer,
+    imageUrl: certification.imageUrl ?? "",
+    newImage: null,
+    previewUrl: null,
+    removeImage: false,
+  };
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -112,7 +142,7 @@ export default function ContentTab({ config }: ContentTabProps) {
   // ── About state ─────────────────────────────────────────────────────────────
   const [bio, setBio] = useState(config.about.bio);
   const [certs, setCerts] = useState<CertForm[]>(
-    config.about.certifications.map((c) => ({ name: c.name, issuer: c.issuer }))
+    config.about.certifications.map(certificationToForm)
   );
   const [aboutLoading, setAboutLoading] = useState(false);
 
@@ -168,20 +198,85 @@ export default function ContentTab({ config }: ContentTabProps) {
   // ── About handlers ──────────────────────────────────────────────────────────
 
   const handleAboutSave = async () => {
+    const payload = new FormData();
+    payload.set("bio", bio);
+    payload.set(
+      "certifications",
+      JSON.stringify(
+        certs.map((cert) => ({
+          publicId: cert.publicId,
+          name: cert.name,
+          issuer: cert.issuer,
+          imageUrl: cert.imageUrl,
+          removeImage: cert.removeImage,
+        }))
+      )
+    );
+
+    certs.forEach((cert, index) => {
+      if (cert.newImage) {
+        payload.set(`certificateImage_${index}`, cert.newImage);
+      }
+    });
+
     setAboutLoading(true);
-    const result = await updateAbout({ bio, certifications: certs });
+    const result = await updateAbout(payload);
     setAboutLoading(false);
     if (result.success) {
+      if (result.data) {
+        setBio(result.data.bio);
+        setCerts(result.data.certifications.map(certificationToForm));
+      }
       showToast("About section saved.", "success");
     } else {
       showToast(result.error ?? "Failed to save about.", "error");
     }
   };
 
-  const addCert = () => setCerts((prev) => [...prev, { name: "", issuer: "" }]);
-  const removeCert = (i: number) => setCerts((prev) => prev.filter((_, idx) => idx !== i));
-  const updateCert = (i: number, field: keyof CertForm, value: string) =>
+  const addCert = () => setCerts((prev) => [...prev, blankCert()]);
+  const removeCert = (i: number) =>
+    setCerts((prev) => {
+      const target = prev[i];
+      if (target?.previewUrl) {
+        URL.revokeObjectURL(target.previewUrl);
+      }
+      return prev.filter((_, idx) => idx !== i);
+    });
+  const updateCert = (i: number, field: "name" | "issuer", value: string) =>
     setCerts((prev) => prev.map((c, idx) => (idx === i ? { ...c, [field]: value } : c)));
+
+  const updateCertImage = (i: number, file: File | null) =>
+    setCerts((prev) =>
+      prev.map((cert, idx) => {
+        if (idx !== i) return cert;
+        if (cert.previewUrl) {
+          URL.revokeObjectURL(cert.previewUrl);
+        }
+        return {
+          ...cert,
+          newImage: file,
+          previewUrl: file ? URL.createObjectURL(file) : null,
+          removeImage: false,
+        };
+      })
+    );
+
+  const removeCertImage = (i: number) =>
+    setCerts((prev) =>
+      prev.map((cert, idx) => {
+        if (idx !== i) return cert;
+        if (cert.previewUrl) {
+          URL.revokeObjectURL(cert.previewUrl);
+        }
+        return {
+          ...cert,
+          imageUrl: "",
+          newImage: null,
+          previewUrl: null,
+          removeImage: true,
+        };
+      })
+    );
 
   // ── Achievements handlers ───────────────────────────────────────────────────
 
@@ -479,28 +574,113 @@ export default function ContentTab({ config }: ContentTabProps) {
             </div>
             <div className="space-y-3">
               {certs.map((cert, i) => (
-                <div key={i} className="flex gap-2">
-                  <input
-                    type="text"
-                    placeholder="Certificate name"
-                    value={cert.name}
-                    onChange={(e) => updateCert(i, "name", e.target.value)}
-                    className="flex-1 rounded-md border border-platinum/20 bg-oxfordBlue px-3 py-2 text-sm text-white placeholder:text-platinum/50 focus:outline-none focus:ring-1 focus:ring-orangeWeb"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Issuer"
-                    value={cert.issuer}
-                    onChange={(e) => updateCert(i, "issuer", e.target.value)}
-                    className="w-28 rounded-md border border-platinum/20 bg-oxfordBlue px-3 py-2 text-sm text-white placeholder:text-platinum/50 focus:outline-none focus:ring-1 focus:ring-orangeWeb"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => removeCert(i)}
-                    className="p-2 text-platinum hover:text-orangeWeb"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
+                <div
+                  key={cert.publicId || i}
+                  className="space-y-4 rounded-lg border border-platinum/10 bg-oxfordBlue p-4"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1 space-y-3">
+                      <input
+                        type="text"
+                        placeholder="Certificate name"
+                        value={cert.name}
+                        onChange={(e) => updateCert(i, "name", e.target.value)}
+                        className="w-full rounded-md border border-platinum/20 bg-black px-3 py-2 text-sm text-white placeholder:text-platinum/50 focus:outline-none focus:ring-1 focus:ring-orangeWeb"
+                      />
+                      <input
+                        type="text"
+                        placeholder="Issuer"
+                        value={cert.issuer}
+                        onChange={(e) => updateCert(i, "issuer", e.target.value)}
+                        className="w-full rounded-md border border-platinum/20 bg-black px-3 py-2 text-sm text-white placeholder:text-platinum/50 focus:outline-none focus:ring-1 focus:ring-orangeWeb"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => removeCert(i)}
+                      className="p-2 text-platinum hover:text-orangeWeb"
+                      aria-label={`Remove ${cert.name || "certificate"}`}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+
+                  <div className="grid gap-4 sm:grid-cols-[140px_1fr]">
+                    <div className="overflow-hidden rounded-lg border border-platinum/10 bg-black/40">
+                      {cert.previewUrl || cert.imageUrl ? (
+                        <div className="relative h-40 w-full">
+                          <Image
+                            src={cert.previewUrl ?? cert.imageUrl}
+                            alt={cert.name || "Certificate preview"}
+                            fill
+                            sizes="140px"
+                            unoptimized={Boolean(cert.previewUrl)}
+                            className="object-cover"
+                          />
+                        </div>
+                      ) : (
+                        <div className="flex h-40 flex-col items-center justify-center gap-2 px-4 text-center text-platinum/55">
+                          <ImagePlus className="h-6 w-6" />
+                          <p className="text-xs">Upload a certificate image</p>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="space-y-3">
+                      <div>
+                        <label className="mb-1.5 block text-xs font-medium uppercase tracking-[0.18em] text-platinum/60">
+                          Certificate Image
+                        </label>
+                        <input
+                          type="file"
+                          accept="image/png,image/jpeg,image/webp,image/avif"
+                          onChange={(e) => updateCertImage(i, e.target.files?.[0] ?? null)}
+                          className="block w-full text-sm text-platinum file:mr-3 file:rounded-md file:border file:border-platinum/20 file:bg-black file:px-3 file:py-2 file:text-sm file:text-platinum hover:file:text-white"
+                        />
+                        <p className="mt-2 text-xs text-platinum/60">
+                          JPG, PNG, WebP, or AVIF. Max 5MB.
+                        </p>
+                      </div>
+
+                      {cert.publicId ? (
+                        <div className="rounded-md border border-platinum/10 bg-black/40 px-3 py-2">
+                          <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-platinum/50">
+                            Share URL
+                          </p>
+                          <p className="mt-1 break-all text-xs text-platinum">
+                            /certificates/{cert.publicId}
+                          </p>
+                        </div>
+                      ) : (
+                        <p className="text-xs text-platinum/60">
+                          The share URL is created automatically after the first save.
+                        </p>
+                      )}
+
+                      <div className="flex flex-wrap gap-3">
+                        {(cert.previewUrl || cert.imageUrl) && (
+                          <button
+                            type="button"
+                            onClick={() => removeCertImage(i)}
+                            className="text-xs text-platinum hover:text-orangeWeb"
+                          >
+                            Remove image
+                          </button>
+                        )}
+                        {cert.publicId && cert.imageUrl && !cert.previewUrl && (
+                          <a
+                            href={`/certificates/${cert.publicId}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex items-center gap-1.5 text-xs text-orangeWeb hover:underline"
+                          >
+                            <ExternalLink className="h-3.5 w-3.5" />
+                            Open public page
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
