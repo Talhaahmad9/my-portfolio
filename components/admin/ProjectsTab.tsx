@@ -465,7 +465,7 @@ export default function ProjectsTab({ projects }: ProjectsTabProps) {
               <input
                 type="file"
                 multiple
-                accept="image/*"
+                accept="image/jpeg,image/png,image/webp,image/avif,image/gif,image/svg+xml"
                 onChange={(event) => {
                   const selected = Array.from(event.target.files ?? []);
                   setForm((current) => ({
@@ -475,6 +475,9 @@ export default function ProjectsTab({ projects }: ProjectsTabProps) {
                 }}
                 className="w-full rounded-md border border-oxfordBlue bg-black px-3 py-2 text-sm text-platinum outline-none file:mr-3 file:rounded file:border-0 file:bg-orangeWeb file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-black"
               />
+              <p className="mt-2 text-xs text-platinum/70">
+                Supported formats: JPG, PNG, WebP, AVIF, GIF, SVG.
+              </p>
 
               {form.existingImages.length > 0 ? (
                 <div className="mt-3">

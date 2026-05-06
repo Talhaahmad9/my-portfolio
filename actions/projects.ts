@@ -29,6 +29,25 @@ interface ProjectPayload {
   order: number;
 }
 
+const ALLOWED_PROJECT_IMAGE_TYPES = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/avif",
+  "image/gif",
+  "image/svg+xml",
+]);
+
+const ALLOWED_PROJECT_IMAGE_EXTENSIONS = new Set([
+  "jpg",
+  "jpeg",
+  "png",
+  "webp",
+  "avif",
+  "gif",
+  "svg",
+]);
+
 function toPlainProject<T>(project: T): T {
   return decodeLegacyEscapedContent(JSON.parse(JSON.stringify(project)) as T);
 }
@@ -79,6 +98,21 @@ function sanitizeFilename(filename: string): string {
   return filename.replace(/[^a-zA-Z0-9._-]/g, "-");
 }
 
+function getFileExtension(filename: string): string {
+  const ext = filename.split(".").pop();
+  return ext ? ext.toLowerCase() : "";
+}
+
+function validateProjectImageFile(file: File): void {
+  const extension = getFileExtension(file.name);
+  const hasAllowedType = ALLOWED_PROJECT_IMAGE_TYPES.has(file.type);
+  const hasAllowedExtension = ALLOWED_PROJECT_IMAGE_EXTENSIONS.has(extension);
+
+  if (!hasAllowedType && !hasAllowedExtension) {
+    throw new Error("Only JPG, PNG, WebP, AVIF, GIF, and SVG files are allowed");
+  }
+}
+
 async function uploadImages(files: File[]): Promise<string[]> {
   if (files.length === 0) {
     return [];
@@ -86,6 +120,7 @@ async function uploadImages(files: File[]): Promise<string[]> {
 
   const uploadResults = await Promise.all(
     files.map(async (file) => {
+      validateProjectImageFile(file);
       const arrayBuffer = await file.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
       const safeName = sanitizeFilename(file.name || "image");

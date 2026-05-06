@@ -10,6 +10,11 @@ interface ProjectCarouselProps {
   title: string;
 }
 
+function isSvgImage(url: string): boolean {
+  const cleanUrl = url.split("?")[0]?.split("#")[0] ?? url;
+  return cleanUrl.toLowerCase().endsWith(".svg");
+}
+
 export default function ProjectCarousel({ images, title }: ProjectCarouselProps) {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -35,13 +40,21 @@ export default function ProjectCarousel({ images, title }: ProjectCarouselProps)
         <div className="flex h-full w-full touch-pan-y">
           {images.map((img, index) => (
             <div key={index} className="relative h-full w-full flex-[0_0_100%] min-w-0">
-              <Image
-                src={img}
-                alt={`${title} image ${index + 1}`}
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              />
+              {isSvgImage(img) ? (
+                <img
+                  src={img}
+                  alt={`${title} image ${index + 1}`}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <Image
+                  src={img}
+                  alt={`${title} image ${index + 1}`}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                />
+              )}
             </div>
           ))}
         </div>
