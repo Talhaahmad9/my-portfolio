@@ -60,7 +60,7 @@ export const skillGroupSchema = z.object({
 });
 
 export const certificationSchema = z.object({
-  publicId: z.string().min(1).optional(),
+  publicId: z.string().min(1).optional().or(z.literal("")),
   name: z.string().min(1, "Name is required"),
   issuer: z.string().min(1, "Issuer is required"),
   imageUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
