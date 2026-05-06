@@ -85,7 +85,7 @@ Everything on the public site is sourced dynamically from MongoDB, so content ch
 | Project media pipeline | Multi-image upload and deletion using Cloudflare R2 |
 | Resume management | Active resume switching reflected instantly in public CTAs |
 | Certificate media pipeline | Admin-managed certificate image uploads with preview, replacement, cleanup, ordering controls, and stable public share pages |
-| Adaptive certificate UX | About section uses a card grid for small sets and a slow auto-playing slideshow when certificate count grows |
+| Adaptive certificate UX | About section uses a card grid for small sets and a slow auto-playing slideshow when certificate count grows (desktop: 3 per slide, mobile: 1 per slide) |
 | Input integrity | Zod validation + sanitization before DB writes |
 | SEO foundation | Metadata API, JSON-LD Person schema, Open Graph, sitemap, robots |
 | Animation system | Shared SectionWrapper and SectionItem reveal pattern |
@@ -327,7 +327,7 @@ Recommended checks after deploy:
 3. Project image upload/delete works.
 4. Resume activate/deactivate flow works across Hero/Nav/Mobile Menu.
 5. Certificate image upload, reorder controls, and replacement work from the content dashboard.
-6. Certificate display uses grid for 1 to 3 cards and switches to slideshow for 4+ cards with slow autoplay.
+6. Certificate display uses grid for 1 to 3 cards and switches to slideshow for 4+ cards with slow autoplay (desktop shows 3 cards per slide, mobile shows 1).
 7. Shared certificate URLs resolve correctly and remain excluded from indexing.
 
 ---

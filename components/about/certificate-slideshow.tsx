@@ -5,12 +5,20 @@ import useEmblaCarousel from "embla-carousel-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Check, ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { typography } from "@/lib/typography";
 import type { ICertification } from "@/lib/db/models/SiteConfig";
 
 interface CertificateSlideshowProps {
   certifications: ICertification[];
+}
+
+function chunkCertifications(items: ICertification[], chunkSize: number): ICertification[][] {
+  const chunks: ICertification[][] = [];
+  for (let index = 0; index < items.length; index += chunkSize) {
+    chunks.push(items.slice(index, index + chunkSize));
+  }
+  return chunks;
 }
 
 function CertificateCard({ certification }: { certification: ICertification }) {
@@ -29,7 +37,7 @@ function CertificateCard({ certification }: { certification: ICertification }) {
             className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
           />
         </div>
-        <div className="space-y-2 px-4 py-4">
+        <div className="space-y-2 px-4 py-4 lg:px-3 lg:py-3">
           <p className="text-base font-medium text-white">{certification.name}</p>
           <p className="text-sm text-platinum">{certification.issuer}</p>
           <p className="inline-flex items-center gap-1.5 text-xs font-medium uppercase tracking-[0.18em] text-orangeWeb">
@@ -54,7 +62,12 @@ function CertificateCard({ certification }: { certification: ICertification }) {
 export default function CertificateSlideshow({
   certifications,
 }: CertificateSlideshowProps) {
-  const hasMultiple = certifications.length > 1;
+  const [cardsPerSlide, setCardsPerSlide] = useState(1);
+  const slides = useMemo(
+    () => chunkCertifications(certifications, cardsPerSlide),
+    [certifications, cardsPerSlide]
+  );
+  const hasMultiple = slides.length > 1;
   const autoplay = useRef(
     Autoplay({
       delay: 9000,
@@ -71,6 +84,23 @@ export default function CertificateSlideshow({
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   useEffect(() => {
+    const desktopQuery = window.matchMedia("(min-width: 1024px)");
+    const updateCardsPerSlide = (matches: boolean) => {
+      setCardsPerSlide(matches ? 3 : 1);
+    };
+
+    updateCardsPerSlide(desktopQuery.matches);
+    const onChange = (event: MediaQueryListEvent) => {
+      updateCardsPerSlide(event.matches);
+    };
+    desktopQuery.addEventListener("change", onChange);
+
+    return () => {
+      desktopQuery.removeEventListener("change", onChange);
+    };
+  }, []);
+
+  useEffect(() => {
     if (!emblaApi) return;
 
     const updateSelectedIndex = () => {
@@ -82,12 +112,18 @@ export default function CertificateSlideshow({
     emblaApi.on("reInit", updateSelectedIndex);
   }, [emblaApi]);
 
+  useEffect(() => {
+    if (!emblaApi) return;
+    emblaApi.scrollTo(0);
+    setSelectedIndex(0);
+  }, [cardsPerSlide, emblaApi]);
+
   if (certifications.length === 0) {
     return null;
   }
 
   return (
-    <div className="rounded-lg border border-orangeWeb/30 bg-oxfordBlue p-5 sm:p-6">
+      <div className="rounded-lg border border-orangeWeb/30 bg-oxfordBlue p-5 sm:p-6">
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className={`${typography.smallEyebrow} mb-2`}>Certificates</p>
@@ -96,19 +132,26 @@ export default function CertificateSlideshow({
           </p>
         </div>
         <p className="shrink-0 text-sm text-platinum/70">
-          {String(selectedIndex + 1).padStart(2, "0")} / {String(certifications.length).padStart(2, "0")}
+          {String(selectedIndex + 1).padStart(2, "0")} / {String(slides.length).padStart(2, "0")}
         </p>
       </div>
 
       <div className="relative mt-6">
         <div className="overflow-hidden" ref={emblaRef}>
           <div className="flex touch-pan-y">
-            {certifications.map((certification) => (
+            {slides.map((slide, slideIndex) => (
               <div
-                key={certification.publicId ?? `${certification.name}-${certification.issuer}`}
+                key={`certificate-slide-${slideIndex}`}
                 className="min-w-0 flex-[0_0_100%]"
               >
-                <CertificateCard certification={certification} />
+                <div className="grid gap-4 lg:grid-cols-3">
+                  {slide.map((certification) => (
+                    <CertificateCard
+                      key={certification.publicId ?? `${certification.name}-${certification.issuer}`}
+                      certification={certification}
+                    />
+                  ))}
+                </div>
               </div>
             ))}
           </div>
@@ -133,9 +176,9 @@ export default function CertificateSlideshow({
       </div>
 
       <div className="mt-6 flex items-center justify-center gap-2">
-        {certifications.map((certification, index) => (
+        {slides.map((_, index) => (
           <button
-            key={`${certification.publicId ?? certification.name}-dot-${index}`}
+            key={`certificate-dot-${index}`}
             type="button"
             onClick={() => emblaApi?.scrollTo(index)}
             className={`h-2 w-2 rounded-full transition-colors ${
