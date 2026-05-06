@@ -1,4 +1,5 @@
-import { Check, ExternalLink, Link2, Trophy } from "lucide-react";
+import { Check } from "lucide-react";
+import AchievementSlideshow from "@/components/about/achievement-slideshow";
 import SectionWrapper, { SectionItem } from "@/components/shared/section-wrapper";
 import { typography } from "@/lib/typography";
 import type { IAchievement, ISkillGroup } from "@/lib/db/models/SiteConfig";
@@ -24,8 +25,7 @@ export default function AboutSection({
     .split(/\n+/)
     .map((p) => p.trim())
     .filter(Boolean);
-
-  const primaryAchievement = achievements[0];
+  const hasAchievements = achievements.length > 0;
 
   return (
     <SectionWrapper id="about" className="py-24 px-6 bg-transparent">
@@ -40,7 +40,7 @@ export default function AboutSection({
         </SectionItem>
 
         {/* Two-column: bio left, achievement card right */}
-        <div className="mt-12 grid gap-10 lg:grid-cols-2">
+        <div className={`mt-12 grid gap-10 ${hasAchievements ? "lg:grid-cols-2" : ""}`}>
 
           {/* Bio */}
           <SectionItem>
@@ -52,84 +52,9 @@ export default function AboutSection({
           </SectionItem>
 
           {/* Achievement highlight card */}
-          {primaryAchievement && (
+          {hasAchievements && (
             <SectionItem>
-              <div className="rounded-lg border border-orangeWeb/30 bg-oxfordBlue p-6 h-full">
-                <div className="flex items-start gap-4">
-                  <div className="rounded-full border border-orangeWeb/20 bg-orangeWeb/10 p-3 text-orangeWeb">
-                    <Trophy className="h-7 w-7" aria-hidden="true" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className={`${typography.smallEyebrow} mb-2`}>Recent Achievement</p>
-                    <h3 className={typography.cardTitle}>{primaryAchievement.title}</h3>
-                    <p className="mt-2 text-base text-platinum">{primaryAchievement.event}</p>
-
-                    <div className="mt-4 space-y-2 text-base text-platinum">
-                      {primaryAchievement.score && (
-                        <p>
-                          <span className="text-white font-medium">Score:</span>{" "}
-                          {primaryAchievement.score}
-                        </p>
-                      )}
-                      <p>
-                        <span className="text-white font-medium">Result:</span>{" "}
-                        {primaryAchievement.place}
-                      </p>
-                      {primaryAchievement.description && (
-                        <p>
-                          <span className="text-white font-medium">Project:</span>{" "}
-                          {primaryAchievement.description}
-                        </p>
-                      )}
-                      {primaryAchievement.stack.length > 0 && (
-                        <p>
-                          <span className="text-white font-medium">Stack:</span>{" "}
-                          {primaryAchievement.stack.join(" · ")}
-                        </p>
-                      )}
-                    </div>
-
-                    {/* Optional links */}
-                    {(primaryAchievement.liveUrl || primaryAchievement.githubUrl) && (
-                      <div className="mt-4 flex items-center gap-3">
-                        {primaryAchievement.liveUrl && (
-                          <a
-                            href={primaryAchievement.liveUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 text-sm text-orangeWeb hover:underline"
-                          >
-                            <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
-                            Live
-                          </a>
-                        )}
-                        {primaryAchievement.githubUrl && (
-                          <a
-                            href={primaryAchievement.githubUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 text-sm text-platinum hover:text-white"
-                          >
-                            <Link2 className="h-3.5 w-3.5" aria-hidden="true" />
-                            GitHub
-                          </a>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Education */}
-                <div className="mt-6 pt-6 border-t border-platinum/10">
-                  <p className={`${typography.smallEyebrow} mb-3`}>Education</p>
-                  <p className="text-base font-medium text-white">
-                    BS Computer Science — IoBM, Karachi
-                  </p>
-                  <p className="mt-1 text-base text-platinum">
-                    Sep 2023 – Present · Expected 2027
-                  </p>
-                </div>
-              </div>
+              <AchievementSlideshow achievements={achievements} />
             </SectionItem>
           )}
         </div>

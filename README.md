@@ -57,7 +57,7 @@ Everything on the public site is sourced dynamically from MongoDB, so content ch
 | Area | What it does |
 |---|---|
 | Navbar + Hero | Identity, CTA actions, dynamic active CV link |
-| About | Bio, achievements, skills, certifications (from SiteConfig) |
+| About | Bio, auto-playing achievements slideshow, skills, certifications (from SiteConfig) |
 | Wins | Dynamic records from MongoDB |
 | Projects | Dynamic cards and image carousel from MongoDB + R2 |
 | Footer | Contact endpoints and profile links |
@@ -67,7 +67,7 @@ Everything on the public site is sourced dynamically from MongoDB, so content ch
 | Route | Purpose |
 |---|---|
 | /admin | Secure login for admin |
-| /admin/dashboard/content | Edit Hero and About content |
+| /admin/dashboard/content | Edit Hero and About content, including achievement slide ordering |
 | /admin/dashboard/projects | Full project CRUD and ordering |
 | /admin/dashboard/wins | Add/remove wins |
 | /admin/dashboard/resume | Upload, activate, and delete resumes |
@@ -85,6 +85,7 @@ Everything on the public site is sourced dynamically from MongoDB, so content ch
 | Input integrity | Zod validation + sanitization before DB writes |
 | SEO foundation | Metadata API, JSON-LD Person schema, Open Graph, sitemap, robots |
 | Animation system | Shared SectionWrapper and SectionItem reveal pattern |
+| Achievement storytelling | About section supports multiple achievements with slideshow controls and admin-managed ordering |
 
 ---
 
@@ -99,6 +100,7 @@ Everything on the public site is sourced dynamically from MongoDB, so content ch
 ![NextAuth](https://img.shields.io/badge/NextAuth_v5-14213d?style=flat-square&logo=nextdotjs&logoColor=ffffff)
 ![Cloudflare R2](https://img.shields.io/badge/Cloudflare_R2-14213d?style=flat-square&logo=cloudflare&logoColor=ffffff)
 ![Framer Motion](https://img.shields.io/badge/Framer_Motion-14213d?style=flat-square&logo=framer&logoColor=ffffff)
+![Embla Carousel](https://img.shields.io/badge/Embla_Carousel-14213d?style=flat-square&logoColor=ffffff)
 ![Vercel](https://img.shields.io/badge/Vercel-14213d?style=flat-square&logo=vercel&logoColor=ffffff)
 
 </div>
@@ -109,6 +111,7 @@ Everything on the public site is sourced dynamically from MongoDB, so content ch
 | Language | TypeScript 5 (strict mode) |
 | Styling | Tailwind CSS v4 (`@theme` tokens) |
 | Animations | Framer Motion 12 |
+| Sliders | Embla Carousel + Autoplay |
 | Database | MongoDB Atlas + Mongoose |
 | Authentication | NextAuth v5 (Credentials provider only) |
 | Storage | Cloudflare R2 via AWS S3-compatible SDK |
@@ -206,6 +209,7 @@ Collections used:
 2. `wins` are sorted by latest date first.
 3. `resume` keeps exactly one active CV at a time.
 4. `siteconfigs` acts as a singleton content source for Hero and About sections.
+5. `about.achievements` is an ordered array, and that order drives the public slideshow sequence.
 
 ---
 
@@ -292,7 +296,7 @@ npm run seed
 1. Dashboard routes are protected through `proxy.ts`.
 2. All mutating actions verify session first.
 3. Zod validation blocks malformed payloads.
-4. Sanitization protects against unsafe content before persistence.
+4. Plain text content is normalized before persistence and rendered through React text nodes instead of storing HTML entities.
 5. Storage credentials are server-only.
 
 ---

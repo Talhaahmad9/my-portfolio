@@ -6,7 +6,7 @@ import { z } from "zod";
 import { IProject, ProjectModel } from "@/lib/db/models/Project";
 import { normalizeProjectBadgeLabel } from "@/lib/project-badges";
 import { projectSchema } from "@/lib/validate";
-import { sanitizeObject } from "@/lib/sanitize";
+import { decodeLegacyEscapedContent, sanitizeObject } from "@/lib/sanitize";
 import { deleteFromR2, extractR2Key, uploadToR2 } from "@/lib/r2";
 import { auth } from "@/lib/auth";
 
@@ -30,7 +30,7 @@ interface ProjectPayload {
 }
 
 function toPlainProject<T>(project: T): T {
-  return JSON.parse(JSON.stringify(project)) as T;
+  return decodeLegacyEscapedContent(JSON.parse(JSON.stringify(project)) as T);
 }
 
 function parseStringArray(json: string | null): string[] {

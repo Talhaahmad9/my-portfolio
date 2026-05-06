@@ -237,6 +237,25 @@ export default function ContentTab({ config }: ContentTabProps) {
     }
   };
 
+  const moveAchievement = async (index: number, direction: "up" | "down") => {
+    const targetIndex = direction === "up" ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= achievements.length) return;
+
+    const updated = [...achievements];
+    [updated[index], updated[targetIndex]] = [updated[targetIndex]!, updated[index]!];
+
+    setAchievementsLoading(true);
+    const result = await updateAchievements(updated);
+    setAchievementsLoading(false);
+
+    if (result.success) {
+      setAchievements(updated);
+      showToast("Achievement order updated.", "success");
+    } else {
+      showToast(result.error ?? "Failed to reorder achievements.", "error");
+    }
+  };
+
   const addAchievementStackChip = () => {
     const trimmed = achievementForm.stackInput.trim();
     if (!trimmed) return;
@@ -503,7 +522,10 @@ export default function ContentTab({ config }: ContentTabProps) {
         <div className="max-w-2xl">
           {achievementView === "list" && (
             <>
-              <div className="mb-4 flex justify-end">
+              <div className="mb-4 flex items-center justify-between gap-4">
+                <p className="text-xs text-platinum/60">
+                  The list order controls slideshow order on the public About section.
+                </p>
                 <button
                   type="button"
                   onClick={openAddAchievement}
@@ -522,10 +544,31 @@ export default function ContentTab({ config }: ContentTabProps) {
                     className="flex items-center justify-between rounded-lg border border-platinum/10 bg-oxfordBlue px-4 py-3"
                   >
                     <div className="min-w-0">
+                      <p className="mb-1 text-[11px] font-medium uppercase tracking-[0.2em] text-orangeWeb/80">
+                        Slide {String(i + 1).padStart(2, "0")}
+                      </p>
                       <p className="truncate text-sm font-medium text-white">{a.title}</p>
                       <p className="text-xs text-platinum">{a.event} · {a.place}</p>
                     </div>
                     <div className="flex shrink-0 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => void moveAchievement(i, "up")}
+                        disabled={achievementsLoading || i === 0}
+                        className="p-1.5 text-platinum hover:text-white disabled:opacity-30"
+                        aria-label={`Move ${a.title} up`}
+                      >
+                        <ChevronUp className="h-4 w-4" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => void moveAchievement(i, "down")}
+                        disabled={achievementsLoading || i === achievements.length - 1}
+                        className="p-1.5 text-platinum hover:text-white disabled:opacity-30"
+                        aria-label={`Move ${a.title} down`}
+                      >
+                        <ChevronDown className="h-4 w-4" />
+                      </button>
                       <button
                         type="button"
                         onClick={() => openEditAchievement(i)}

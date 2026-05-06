@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { IWin, WinModel } from "@/lib/db/models/Win";
 import { auth } from "@/lib/auth";
-import { sanitizeObject } from "@/lib/sanitize";
+import { decodeLegacyEscapedContent, sanitizeObject } from "@/lib/sanitize";
 import { winSchema } from "@/lib/validate";
 
 interface ActionResult<T> {
@@ -14,7 +14,7 @@ interface ActionResult<T> {
 }
 
 function toPlainWin<T>(value: T): T {
-  return JSON.parse(JSON.stringify(value)) as T;
+  return decodeLegacyEscapedContent(JSON.parse(JSON.stringify(value)) as T);
 }
 
 function normalizeOptionalString(value: string | undefined): string | undefined {

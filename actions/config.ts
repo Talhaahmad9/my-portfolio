@@ -9,7 +9,7 @@ import {
   type IAchievement,
   type ISkillGroup,
 } from "@/lib/db/models/SiteConfig";
-import { escapeHTML, sanitizeObject } from "@/lib/sanitize";
+import { decodeLegacyEscapedContent, sanitizeObject } from "@/lib/sanitize";
 import {
   heroConfigSchema,
   aboutConfigSchema,
@@ -48,12 +48,14 @@ export async function getSiteConfig(): Promise<SiteConfigPlain> {
     return JSON.parse(JSON.stringify(DEFAULT_SITE_CONFIG)) as SiteConfigPlain;
   }
 
-  return JSON.parse(
-    JSON.stringify({
-      hero: doc.hero,
-      about: doc.about,
-    })
-  ) as SiteConfigPlain;
+  return decodeLegacyEscapedContent(
+    JSON.parse(
+      JSON.stringify({
+        hero: doc.hero,
+        about: doc.about,
+      })
+    ) as SiteConfigPlain
+  );
 }
 
 // ─── Hero ─────────────────────────────────────────────────────────────────────
@@ -69,10 +71,10 @@ export async function updateHero(
     return { success: false, error: parsed.error.issues[0]?.message ?? "Validation failed" };
   }
 
-  const clean = {
-    tagline: escapeHTML(parsed.data.tagline),
-    typewriterStrings: parsed.data.typewriterStrings.map((s) => escapeHTML(s)),
-  };
+  const clean = sanitizeObject({
+    tagline: parsed.data.tagline,
+    typewriterStrings: parsed.data.typewriterStrings,
+  });
 
   await connectDB();
   await SiteConfigModel.findOneAndUpdate(
@@ -98,12 +100,10 @@ export async function updateAbout(
     return { success: false, error: parsed.error.issues[0]?.message ?? "Validation failed" };
   }
 
-  const clean = {
-    bio: escapeHTML(parsed.data.bio),
-    certifications: parsed.data.certifications.map((c) =>
-      sanitizeObject({ name: c.name, issuer: c.issuer })
-    ),
-  };
+  const clean = sanitizeObject({
+    bio: parsed.data.bio,
+    certifications: parsed.data.certifications,
+  });
 
   await connectDB();
   await SiteConfigModel.findOneAndUpdate(
@@ -129,8 +129,8 @@ export async function updateAchievements(
     return { success: false, error: parsed.error.issues[0]?.message ?? "Validation failed" };
   }
 
-  const clean = parsed.data.map((a) =>
-    sanitizeObject({
+  const clean = sanitizeObject(
+    parsed.data.map((a) => ({
       title: a.title,
       event: a.event,
       place: a.place,
@@ -139,7 +139,7 @@ export async function updateAchievements(
       liveUrl: a.liveUrl ?? "",
       githubUrl: a.githubUrl ?? "",
       stack: a.stack,
-    })
+    }))
   );
 
   await connectDB();
@@ -166,10 +166,10 @@ export async function updateSkills(
     return { success: false, error: parsed.error.issues[0]?.message ?? "Validation failed" };
   }
 
-  const clean = parsed.data.map((g) => ({
-    category: escapeHTML(g.category),
-    items: g.items.map((i) => escapeHTML(i)),
-  }));
+  const clean = sanitizeObject(parsed.data.map((g) => ({
+    category: g.category,
+    items: g.items,
+  })));
 
   await connectDB();
   await SiteConfigModel.findOneAndUpdate(
