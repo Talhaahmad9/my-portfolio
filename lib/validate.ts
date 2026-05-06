@@ -15,6 +15,7 @@ export const projectSchema = z.object({
   bullets: z.array(z.string()),
   tags: z.array(z.string()),
   images: z.array(z.string()),
+  imageFit: z.enum(["cover", "contain"]).default("cover"),
   liveUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
   githubUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
   badge: z.string().optional(),

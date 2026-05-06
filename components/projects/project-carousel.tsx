@@ -8,6 +8,7 @@ import { useCallback, useEffect, useState } from "react";
 interface ProjectCarouselProps {
   images: string[];
   title: string;
+  imageFit?: "cover" | "contain";
 }
 
 function isSvgImage(url: string): boolean {
@@ -15,7 +16,7 @@ function isSvgImage(url: string): boolean {
   return cleanUrl.toLowerCase().endsWith(".svg");
 }
 
-export default function ProjectCarousel({ images, title }: ProjectCarouselProps) {
+export default function ProjectCarousel({ images, title, imageFit = "cover" }: ProjectCarouselProps) {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
   const [selectedIndex, setSelectedIndex] = useState(0);
 
@@ -35,7 +36,7 @@ export default function ProjectCarousel({ images, title }: ProjectCarouselProps)
   }, [emblaApi, onSelect]);
 
   return (
-    <div className="relative aspect-[16/9] w-full overflow-hidden rounded-t-lg">
+    <div className="relative aspect-video w-full overflow-hidden rounded-t-lg">
       <div className="h-full w-full" ref={emblaRef}>
         <div className="flex h-full w-full touch-pan-y">
           {images.map((img, index) => (
@@ -44,14 +45,14 @@ export default function ProjectCarousel({ images, title }: ProjectCarouselProps)
                 <img
                   src={img}
                   alt={`${title} image ${index + 1}`}
-                  className="h-full w-full object-cover"
+                  className={`h-full w-full ${imageFit === "contain" ? "object-contain" : "object-cover"}`}
                 />
               ) : (
                 <Image
                   src={img}
                   alt={`${title} image ${index + 1}`}
                   fill
-                  className="object-cover"
+                  className={imageFit === "contain" ? "object-contain" : "object-cover"}
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 />
               )}

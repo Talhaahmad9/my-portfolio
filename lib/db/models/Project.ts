@@ -7,6 +7,7 @@ export interface IProject extends Document {
   bullets: string[];
   tags: string[];
   images: string[];
+  imageFit: "cover" | "contain";
   liveUrl?: string;
   githubUrl?: string;
   badge?: string;
@@ -37,6 +38,11 @@ const ProjectSchema = new Schema<IProject>({
   images: {
     type: [String],
     default: [],
+  },
+  imageFit: {
+    type: String,
+    enum: ["cover", "contain"],
+    default: "cover",
   },
   liveUrl: {
     type: String,

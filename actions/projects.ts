@@ -22,6 +22,7 @@ interface ProjectPayload {
   bullets: string[];
   tags: string[];
   images: string[];
+  imageFit: "cover" | "contain";
   liveUrl?: string;
   githubUrl?: string;
   badge?: string;
@@ -146,6 +147,7 @@ function buildProjectPayload(formData: FormData, images: string[]): ProjectPaylo
     bullets: parseStringArray(formData.get("bullets")?.toString() ?? null),
     tags: parseStringArray(formData.get("tags")?.toString() ?? null),
     images,
+    imageFit: String(formData.get("imageFit") ?? "cover"),
     liveUrl: String(formData.get("liveUrl") ?? ""),
     githubUrl: String(formData.get("githubUrl") ?? ""),
     badge: String(formData.get("badge") ?? ""),

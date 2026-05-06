@@ -18,7 +18,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
       
       {project.images && project.images.length > 0 && (
         <div className="-mx-6 -mt-6 mb-6">
-          <ProjectCarousel images={project.images} title={project.title} />
+          <ProjectCarousel images={project.images} title={project.title} imageFit={project.imageFit ?? "cover"} />
         </div>
       )}
 
