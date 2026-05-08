@@ -31,6 +31,9 @@ export const metadata: Metadata = {
   description:
     "Full Stack Developer and GenAI Specialist building high-performance web applications and production-grade AI systems.",
   metadataBase: new URL("https://talhaahmad.me"),
+  alternates: {
+    canonical: "https://talhaahmad.me",
+  },
   verification: {
     google: "76_987pdZ9u8OKA3pi0fkXpOklT-QRGBv0msa2sQ8VY",
   },
