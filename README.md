@@ -1,7 +1,7 @@
 <div align="center">
   <img src="public/logo.png" alt="Talha Ahmad Portfolio" height="68" />
   <br /><br />
-  <p><strong>Full-Stack AI Engineer Portfolio + Admin CMS</strong></p>
+  <p><strong>Full-Stack Developer Portfolio + Admin CMS</strong></p>
   <p>Dynamic content, secure admin workflows, and production-ready architecture.</p>
   <br />
 
