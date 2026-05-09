@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist_Mono, Instrument_Sans, Space_Grotesk } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import PageTransition from "@/components/shared/page-transition";
 import BackToTop from "@/components/shared/back-to-top";
@@ -99,6 +100,7 @@ export default function RootLayout({
         <CursorGlow />
         <PageTransition>{children}</PageTransition>
         <BackToTop />
+        <Analytics />
       </body>
     </html>
   );
