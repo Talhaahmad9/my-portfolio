@@ -27,9 +27,9 @@ const geistMono = Geist_Mono({
 
 // ─── SEO Metadata ─────────────────────────────────────────────────────────────
 export const metadata: Metadata = {
-  title: "Talha Ahmad | Full Stack Developer & GenAI Specialist",
+  title: "Talha Ahmad | Full Stack Developer",
   description:
-    "Full Stack Developer and GenAI Specialist building high-performance web applications and production-grade AI systems.",
+    "Full Stack Developer building high-performance web applications and production-grade AI systems.",
   metadataBase: new URL("https://talhaahmad.me"),
   alternates: {
     canonical: "https://talhaahmad.me",
@@ -42,15 +42,15 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: "https://talhaahmad.me",
     siteName: "Talha Ahmad",
-    title: "Talha Ahmad | Full Stack Developer & GenAI Specialist",
+    title: "Talha Ahmad | Full Stack Developer",
     description:
-      "Full Stack Developer and GenAI Specialist building high-performance web applications and production-grade AI systems.",
+      "Full Stack Developer building high-performance web applications and production-grade AI systems.",
     images: [
       {
         url: "/avatar.png",
         width: 1200,
         height: 630,
-        alt: "Talha Ahmad — Full Stack Developer & GenAI Specialist",
+        alt: "Talha Ahmad — Full Stack Developer",
       },
     ],
   },
@@ -58,7 +58,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Talha Ahmad | Full Stack Developer",
     description:
-      "Full Stack Developer and GenAI Specialist building high-performance web applications and production-grade AI systems.",
+      "Full Stack Developer building high-performance web applications and production-grade AI systems.",
     images: ["/og-image.JPG"],
   },
 };
@@ -68,7 +68,7 @@ const personSchema = {
   "@context": "https://schema.org",
   "@type": "Person",
   name: "Talha Ahmad",
-  jobTitle: "Full Stack Developer & GenAI Specialist",
+  jobTitle: "Full Stack Developer",
   description: "Computer Science Student at IoBM",
   url: "https://talhaahmad.me",
   sameAs: [

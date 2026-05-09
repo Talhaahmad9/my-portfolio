@@ -89,10 +89,10 @@ const SiteConfigSchema = new Schema<ISiteConfig>({
       type: [String],
       default: [
         "Full Stack Developer",
-        "GenAI Specialist",
-        "LLM Engineer",
+        "Web developer",
+        "Frontend Developer",
         "Next.js Developer",
-        "AI Agent Builder",
+        "Backend Developer",
       ],
     },
   },
@@ -135,7 +135,7 @@ export const DEFAULT_SITE_CONFIG = {
       "I build intelligent systems and high-performance web applications — from fine-tuned LLMs to production-ready Next.js products.",
     typewriterStrings: [
       "Full Stack Developer",
-      "GenAI Specialist",
+      "Full Stack Developer",
       "LLM Engineer",
       "Next.js Developer",
       "AI Agent Builder",
@@ -143,7 +143,7 @@ export const DEFAULT_SITE_CONFIG = {
   },
   about: {
     heading: "Full-Stack Developer",
-    bio: `I'm Talha Ahmad — a Full Stack Developer and GenAI Specialist, and Computer Science student at the Institute of Business Management (IoBM), Karachi, expected to graduate in 2027.\n\nI build production-grade web applications and intelligent AI systems end-to-end — from fine-tuned LLM pipelines to fully-deployed Next.js products. My current focus is AI agent architecture and LLM orchestration, with a growing body of work in multi-agent GenAI frameworks.\n\nMost recently, I won 1st place at Hackfest × Datathon 2026 hosted by IBA Karachi — building a multi-agent narrative simulation engine using LangGraph and Google Gemini 2.0 Flash, scoring 88/100 against teams from leading Pakistani universities.\n\nI'm open to remote roles in AI engineering, full-stack development, or GenAI product teams.`,
+    bio: `I'm Talha Ahmad — a Full Stack Developer, and Computer Science student at the Institute of Business Management (IoBM), Karachi, expected to graduate in 2027.\n\nI build production-grade web applications and intelligent AI systems end-to-end — from fine-tuned LLM pipelines to fully-deployed Next.js products. My current focus is AI agent architecture and LLM orchestration, with a growing body of work in multi-agent GenAI frameworks.\n\nMost recently, I won 1st place at Hackfest × Datathon 2026 hosted by IBA Karachi — building a multi-agent narrative simulation engine using LangGraph and Google Gemini 2.0 Flash, scoring 88/100 against teams from leading Pakistani universities.\n\nI'm open to remote roles in AI engineering, full-stack development, or GenAI product teams.`,
     bullets: [],
     achievements: [
       {
