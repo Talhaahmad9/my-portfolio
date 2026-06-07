@@ -17,14 +17,16 @@ export default async function Home() {
   const wins = await getWins();
   const activeResume = await getActiveResume();
   const resumeUrl = activeResume?.fileUrl ?? null;
+  const resumeLabel = activeResume?.label ?? null;
   const siteConfig = await getSiteConfig();
 
   return (
     <>
-      <Navbar resumeUrl={resumeUrl} />
+      <Navbar resumeUrl={resumeUrl} resumeLabel={resumeLabel} />
       <main>
         <HeroSection
           resumeUrl={resumeUrl}
+          resumeLabel={resumeLabel}
           tagline={siteConfig.hero.tagline}
           typewriterStrings={siteConfig.hero.typewriterStrings}
         />

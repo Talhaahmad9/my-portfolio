@@ -5,6 +5,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { Download, Menu, X } from "lucide-react";
 import { typography } from "@/lib/typography";
+import { getDownloadFilename } from "@/lib/getDownloadFilename";
+import { downloadFile } from "@/utils/downloadFile";
 
 const navLinks = [
   { label: "About",    href: "#about"    },
@@ -19,7 +21,7 @@ const drawerVariants = {
   exit:   { opacity: 0, y: -8 },
 };
 
-export default function MobileMenu({ resumeUrl }: { resumeUrl: string | null }) {
+export default function MobileMenu({ resumeUrl, resumeLabel }: { resumeUrl: string | null; resumeLabel?: string | null }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -72,11 +74,19 @@ export default function MobileMenu({ resumeUrl }: { resumeUrl: string | null }) 
             {resumeUrl && (
               <div className="mt-5 border-t border-oxfordBlue/70 pt-5">
                 <a
-                  href={resumeUrl}
+                  href="/api/resume/download"
                   target="_blank"
                   rel="noopener noreferrer"
-                  download
-                  onClick={() => setOpen(false)}
+                  download={getDownloadFilename(resumeLabel ?? null, resumeUrl)}
+                  onClick={async (e) => {
+                    e.preventDefault();
+                    setOpen(false);
+                    try {
+                      await downloadFile('/api/resume/download', getDownloadFilename(resumeLabel ?? null, resumeUrl));
+                    } catch (err) {
+                      window.open('/api/resume/download', "_blank");
+                    }
+                  }}
                   className="inline-flex items-center gap-2 rounded-md bg-orangeWeb px-4 py-2.5 text-base font-semibold text-black transition-opacity hover:opacity-90"
                 >
                   <Download className="h-4 w-4" aria-hidden="true" />

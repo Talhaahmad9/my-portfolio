@@ -4,10 +4,24 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { ArrowRight, Download, FolderGit2, Mail } from "lucide-react";
 import { EMAIL, GITHUB_URL } from "@/lib/config";
+import { getDownloadFilename } from "@/lib/getDownloadFilename";
+import { downloadFile } from "@/utils/downloadFile";
 
 // ─── CTA Buttons (client island for hover animations) ─────────────────────────
 
-export default function HeroActions({ resumeUrl }: { resumeUrl: string | null }) {
+export default function HeroActions({ resumeUrl, resumeLabel }: { resumeUrl: string | null; resumeLabel?: string | null }) {
+  const filename = getDownloadFilename(resumeLabel ?? null, resumeUrl ?? null);
+
+  async function handleDownload(e: React.MouseEvent<HTMLAnchorElement>) {
+    if (!resumeUrl) return;
+    e.preventDefault();
+    try {
+      await downloadFile(resumeUrl, filename);
+    } catch (err) {
+      // Fallback: open in new tab if fetch/download fails
+      window.open(resumeUrl, "_blank");
+    }
+  }
   return (
     <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
       <motion.a
@@ -22,10 +36,12 @@ export default function HeroActions({ resumeUrl }: { resumeUrl: string | null })
 
       {resumeUrl && (
         <motion.a
-          href={resumeUrl}
+          href="/api/resume/download"
+          // same-origin download endpoint will provide Content-Disposition
           target="_blank"
           rel="noopener noreferrer"
-          download
+          download={filename}
+          onClick={handleDownload}
           whileHover={{ scale: 1.04 }}
           whileTap={{ scale: 0.97 }}
           className="inline-flex items-center gap-2 rounded-md border border-orangeWeb px-6 py-3.5 text-base font-semibold text-orangeWeb transition-colors hover:bg-orangeWeb hover:text-black"

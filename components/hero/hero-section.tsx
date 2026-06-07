@@ -8,11 +8,12 @@ import HeroTypewriter from "./hero-typewriter";
 
 interface HeroSectionProps {
   resumeUrl: string | null;
+  resumeLabel?: string | null;
   tagline: string;
   typewriterStrings: string[];
 }
 
-export default function HeroSection({ resumeUrl, tagline, typewriterStrings }: HeroSectionProps) {
+export default function HeroSection({ resumeUrl, resumeLabel, tagline, typewriterStrings }: HeroSectionProps) {
   return (
     <SectionWrapper
       id="hero"
@@ -47,7 +48,7 @@ export default function HeroSection({ resumeUrl, tagline, typewriterStrings }: H
 
         <SectionItem>
           {/* Client island — handles hover / click animations */}
-          <HeroActions resumeUrl={resumeUrl} />
+          <HeroActions resumeUrl={resumeUrl} resumeLabel={resumeLabel} />
         </SectionItem>
 
       </div>
