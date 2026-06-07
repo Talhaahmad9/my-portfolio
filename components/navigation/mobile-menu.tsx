@@ -7,6 +7,8 @@ import { Download, Menu, X } from "lucide-react";
 import { typography } from "@/lib/typography";
 import { getDownloadFilename } from "@/lib/getDownloadFilename";
 import { downloadFile } from "@/utils/downloadFile";
+import InlineLoader from "@/components/shared/InlineLoader";
+import { useState } from "react";
 
 const navLinks = [
   { label: "About",    href: "#about"    },
@@ -23,6 +25,7 @@ const drawerVariants = {
 
 export default function MobileMenu({ resumeUrl, resumeLabel }: { resumeUrl: string | null; resumeLabel?: string | null }) {
   const [open, setOpen] = useState(false);
+  const [loadingDownload, setLoadingDownload] = useState(false);
 
   return (
     <div className="sm:hidden">
@@ -80,17 +83,29 @@ export default function MobileMenu({ resumeUrl, resumeLabel }: { resumeUrl: stri
                   download={getDownloadFilename(resumeLabel ?? null, resumeUrl)}
                   onClick={async (e) => {
                     e.preventDefault();
-                    setOpen(false);
+                    setLoadingDownload(true);
                     try {
                       await downloadFile('/api/resume/download', getDownloadFilename(resumeLabel ?? null, resumeUrl));
                     } catch (err) {
+                      console.error(err);
                       window.open('/api/resume/download', "_blank");
+                      try { alert('Download failed — opening in a new tab.'); } catch {}
+                    } finally {
+                      setLoadingDownload(false);
+                      setOpen(false);
                     }
                   }}
-                  className="inline-flex items-center gap-2 rounded-md bg-orangeWeb px-4 py-2.5 text-base font-semibold text-black transition-opacity hover:opacity-90"
+                  aria-busy={loadingDownload}
+                  className={`inline-flex items-center gap-2 rounded-md bg-orangeWeb px-4 py-2.5 text-base font-semibold text-black transition-opacity hover:opacity-90 ${loadingDownload ? 'opacity-80 pointer-events-none' : ''}`}
                 >
-                  <Download className="h-4 w-4" aria-hidden="true" />
-                  Download CV
+                  {loadingDownload ? (
+                    <InlineLoader size={18} />
+                  ) : (
+                    <>
+                      <Download className="h-4 w-4" aria-hidden="true" />
+                      Download CV
+                    </>
+                  )}
                 </a>
               </div>
             )}

@@ -2,24 +2,33 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { useState } from "react";
 import { ArrowRight, Download, FolderGit2, Mail } from "lucide-react";
 import { EMAIL, GITHUB_URL } from "@/lib/config";
 import { getDownloadFilename } from "@/lib/getDownloadFilename";
 import { downloadFile } from "@/utils/downloadFile";
+import InlineLoader from "@/components/shared/InlineLoader";
 
 // ─── CTA Buttons (client island for hover animations) ─────────────────────────
 
 export default function HeroActions({ resumeUrl, resumeLabel }: { resumeUrl: string | null; resumeLabel?: string | null }) {
+  const [loading, setLoading] = useState(false);
   const filename = getDownloadFilename(resumeLabel ?? null, resumeUrl ?? null);
 
   async function handleDownload(e: React.MouseEvent<HTMLAnchorElement>) {
     if (!resumeUrl) return;
     e.preventDefault();
+    setLoading(true);
     try {
-      await downloadFile(resumeUrl, filename);
+      await downloadFile('/api/resume/download', filename);
     } catch (err) {
+      console.error(err);
       // Fallback: open in new tab if fetch/download fails
-      window.open(resumeUrl, "_blank");
+      window.open('/api/resume/download', "_blank");
+      // show an alert as a lightweight fallback notification
+      try { alert('Download failed — opening in a new tab.'); } catch {};
+    } finally {
+      setLoading(false);
     }
   }
   return (
@@ -42,12 +51,19 @@ export default function HeroActions({ resumeUrl, resumeLabel }: { resumeUrl: str
           rel="noopener noreferrer"
           download={filename}
           onClick={handleDownload}
+          aria-busy={loading}
           whileHover={{ scale: 1.04 }}
           whileTap={{ scale: 0.97 }}
-          className="inline-flex items-center gap-2 rounded-md border border-orangeWeb px-6 py-3.5 text-base font-semibold text-orangeWeb transition-colors hover:bg-orangeWeb hover:text-black"
+          className={`inline-flex items-center gap-2 rounded-md border border-orangeWeb px-6 py-3.5 text-base font-semibold transition-colors hover:bg-orangeWeb hover:text-black ${loading ? 'opacity-80 pointer-events-none' : 'text-orangeWeb'}`}
         >
-          <Download className="h-4 w-4" aria-hidden="true" />
-          Download CV
+          {loading ? (
+            <InlineLoader size={18} />
+          ) : (
+            <>
+              <Download className="h-4 w-4" aria-hidden="true" />
+              Download CV
+            </>
+          )}
         </motion.a>
       )}
 

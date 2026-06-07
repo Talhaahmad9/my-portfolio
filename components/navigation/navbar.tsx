@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { BriefcaseBusiness, Download, FolderGit2 } from "lucide-react";
+import InlineLoader from "@/components/shared/InlineLoader";
 import { GITHUB_URL, LINKEDIN_URL } from "@/lib/config";
 import { getDownloadFilename } from "@/lib/getDownloadFilename";
 import { downloadFile } from "@/utils/downloadFile";
@@ -33,6 +34,7 @@ const navVariants = {
 
 export default function Navbar({ resumeUrl, resumeLabel }: { resumeUrl: string | null; resumeLabel?: string | null }) {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [loadingDownload, setLoadingDownload] = useState(false);
 
   useEffect(() => {
     const onScroll = () => {
@@ -119,16 +121,28 @@ export default function Navbar({ resumeUrl, resumeLabel }: { resumeUrl: string |
               download={getDownloadFilename(resumeLabel ?? null, resumeUrl)}
               onClick={async (e) => {
                 e.preventDefault();
+                setLoadingDownload(true);
                 try {
                   await downloadFile('/api/resume/download', getDownloadFilename(resumeLabel ?? null, resumeUrl));
                 } catch (err) {
+                  console.error(err);
                   window.open('/api/resume/download', "_blank");
+                  try { alert('Download failed — opening in a new tab.'); } catch {}
+                } finally {
+                  setLoadingDownload(false);
                 }
               }}
-              className="inline-flex items-center gap-2 rounded-md bg-orangeWeb px-4 py-2 text-base font-semibold text-black transition-opacity hover:opacity-90"
+              aria-busy={loadingDownload}
+              className={`inline-flex items-center gap-2 rounded-md bg-orangeWeb px-4 py-2 text-base font-semibold text-black transition-opacity hover:opacity-90 ${loadingDownload ? 'opacity-80 pointer-events-none' : ''}`}
             >
-              <Download className="h-4 w-4" aria-hidden="true" />
-              CV
+              {loadingDownload ? (
+                <InlineLoader size={18} />
+              ) : (
+                <>
+                  <Download className="h-4 w-4" aria-hidden="true" />
+                  CV
+                </>
+              )}
             </a>
           )}
         </div>
