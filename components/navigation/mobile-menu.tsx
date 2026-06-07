@@ -8,7 +8,6 @@ import { typography } from "@/lib/typography";
 import { getDownloadFilename } from "@/lib/getDownloadFilename";
 import { downloadFile } from "@/utils/downloadFile";
 import InlineLoader from "@/components/shared/InlineLoader";
-import { useState } from "react";
 
 const navLinks = [
   { label: "About",    href: "#about"    },
