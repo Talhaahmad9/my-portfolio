@@ -2,7 +2,7 @@
   <img src="public/logo.png" alt="Talha Ahmad Portfolio" height="68" />
   <br /><br />
   <p><strong>Full-Stack Developer Portfolio + Admin CMS</strong></p>
-  <p>Dynamic content, secure admin workflows, and production-ready architecture.</p>
+  <p>Dynamic content, secure admin workflows, and production-ready canonical architecture.</p>
   <br />
 
   ![Live](https://img.shields.io/badge/Live-talhaahmad.me-fca311?style=for-the-badge&logo=vercel&logoColor=000000)
@@ -21,7 +21,7 @@ It combines:
 
 1. A public-facing portfolio built with modern frontend patterns and strong SEO.
 2. A private admin dashboard where all key content can be edited without changing code.
-3. A backend layer for authentication, data storage, file uploads, validation, and secure mutations.
+3. A strictly typed canonical MongoDB data layer managing relationships between skills, roles, events, and awards.
 
 In short: this is a full-stack portfolio platform designed to be maintainable, scalable, and production-ready.
 
@@ -35,214 +35,72 @@ In short: this is a full-stack portfolio platform designed to be maintainable, s
 
 ---
 
-## Problem It Solves
-
-Most portfolio sites become outdated because content updates require direct code edits and redeploys.
-
-This project solves that by introducing a secure CMS-like admin experience where Talha can:
-
-1. Update Hero and About content.
-2. Manage About section heading and custom bullet highlights.
-2. Add, edit, reorder, and delete projects.
-3. Manage hall-of-fame wins.
-4. Upload and switch active resumes.
-5. Upload certificate images, reorder certificates, and share them through dedicated public certificate pages.
-
-Everything on the public site is sourced dynamically from MongoDB, so content changes are fast and code-free.
-
----
-
-## How It Works
-
-### Public side
-
-| Area | What it does |
-|---|---|
-| Navbar + Hero | Identity, CTA actions, dynamic active CV link |
-| About | Bio, auto-playing achievements slideshow, and skills |
-| Projects | Dynamic cards and image carousel from MongoDB + R2, positioned directly after About |
-| Certifications | Dedicated certificate section with adaptive display (grid for up to 3, slideshow for more) |
-| Wins | Dynamic records from MongoDB |
-| Footer | Contact endpoints and profile links |
-| Certificate pages | Shareable direct-link certificate detail pages backed by opaque IDs |
-
-### Admin side
-
-| Route | Purpose |
-|---|---|
-| /admin | Secure login for admin |
-| /admin/dashboard/content | Edit Hero and About content, including About heading, About bullets, achievement ordering, certificate ordering, and certificate image uploads |
-| /admin/dashboard/projects | Full project CRUD and ordering |
-| /admin/dashboard/wins | Add/remove wins |
-| /admin/dashboard/resume | Upload, activate, and delete resumes |
-
----
-
-## Core Features
-
-| Feature | Detail |
-|---|---|
-| Dynamic content | Public sections powered by MongoDB (no hardcoded portfolio records) |
-| Secure admin auth | NextAuth v5 Credentials, protected dashboard routes |
-| Project media pipeline | Multi-image upload and deletion using Cloudflare R2, including SVG logo uploads |
-| Resume management | Active resume switching reflected instantly in public CTAs |
-| Certificate media pipeline | Admin-managed certificate image uploads with preview, replacement, cleanup, ordering controls, and stable public share pages |
-| Adaptive certificate UX | Certifications has its own dedicated section and uses a card grid for small sets and a slow auto-playing slideshow when certificate count grows (desktop: 3 per slide, mobile: 1 per slide) |
-| Input integrity | Zod validation + sanitization before DB writes, with shared sanitizers preserving Date values for admin flows like win creation |
-| SEO foundation | Metadata API, JSON-LD Person schema, Open Graph, sitemap, robots |
-| Animation system | Shared SectionWrapper and SectionItem reveal pattern |
-| Achievement storytelling | About section supports multiple achievements with slideshow controls and admin-managed ordering |
-| About content controls | About heading and bullet highlights are CMS-managed with add/remove/reorder controls |
-| Ambient interaction | Cursor glow now supports desktop pointer movement and active mobile touch interaction |
-| Hero mobile readability | Hero typewriter role line uses tighter mobile typography to keep the line stable under the name |
-
----
-
-## Tech Stack
-
-<div align="center">
-
-![Next.js](https://img.shields.io/badge/Next.js_16-14213d?style=flat-square&logo=nextdotjs&logoColor=ffffff)
-![TypeScript](https://img.shields.io/badge/TypeScript_Strict-14213d?style=flat-square&logo=typescript&logoColor=ffffff)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS_v4-14213d?style=flat-square&logo=tailwindcss&logoColor=ffffff)
-![MongoDB](https://img.shields.io/badge/MongoDB_Atlas-14213d?style=flat-square&logo=mongodb&logoColor=ffffff)
-![NextAuth](https://img.shields.io/badge/NextAuth_v5-14213d?style=flat-square&logo=nextdotjs&logoColor=ffffff)
-![Cloudflare R2](https://img.shields.io/badge/Cloudflare_R2-14213d?style=flat-square&logo=cloudflare&logoColor=ffffff)
-![Framer Motion](https://img.shields.io/badge/Framer_Motion-14213d?style=flat-square&logo=framer&logoColor=ffffff)
-![Embla Carousel](https://img.shields.io/badge/Embla_Carousel-14213d?style=flat-square&logoColor=ffffff)
-![Vercel](https://img.shields.io/badge/Vercel-14213d?style=flat-square&logo=vercel&logoColor=ffffff)
-
-</div>
-
-| Layer | Technology |
-|---|---|
-| Framework | Next.js 16, App Router |
-| Language | TypeScript 5 (strict mode) |
-| Styling | Tailwind CSS v4 (`@theme` tokens) |
-| Animations | Framer Motion 12 |
-| Sliders | Embla Carousel + Autoplay |
-| Database | MongoDB Atlas + Mongoose |
-| Authentication | NextAuth v5 (Credentials provider only) |
-| Storage | Cloudflare R2 via AWS S3-compatible SDK |
-| Validation | Zod |
-| Hosting | Vercel |
-
----
-
-## Design System (Project Colors)
-
-The UI uses exactly these five color tokens:
-
-| Token | Hex | Usage |
-|---|---|---|
-| black | `#000000` | Main canvas/background |
-| oxfordBlue | `#14213d` | Surface layers and structure |
-| orangeWeb | `#fca311` | Accent, CTA, key interaction states |
-| platinum | `#e5e5e5` | Body/secondary copy |
-| white | `#ffffff` | Primary text and headings |
-
-Rules:
-
-1. Use token classes, not arbitrary palette values.
-2. Orange stays the only accent.
-3. No gradients in design language.
-
----
-
 ## Architecture and Rendering Model
 
-1. Every `app/**/page.tsx` remains a Server Component.
-2. Interactivity and animation live in small client islands.
-3. Server Actions handle all data mutations.
-4. All mutable admin operations require authenticated session.
+This project is built heavily around the **Canonical Data Model** approach:
+
+1. Every `app/**/page.tsx` remains a Server Component fetching strictly from a canonical domain.
+2. Interactivity and animation live in small client islands (e.g. `SplashCursor`, `HeroTypewriter`).
+3. Server Actions handle all data mutations and trigger precise `revalidatePath` updates.
+4. Relational data (e.g., Projects linking to Skills, Awards linking to Events) is deeply modeled in MongoDB using ObjectIds.
 
 ### High-level structure
 
 ```text
 portfolio/
-├── app/
-│   ├── page.tsx
-│   ├── layout.tsx
-│   ├── certificates/
-│   │   └── [publicId]/page.tsx
-│   ├── robots.ts
-│   ├── sitemap.ts
-│   ├── admin/
-│   │   ├── page.tsx
-│   │   └── dashboard/
-│   │       ├── content/page.tsx
-│   │       ├── projects/page.tsx
-│   │       ├── wins/page.tsx
-│   │       └── resume/page.tsx
-│   └── api/auth/[...nextauth]/route.ts
-├── actions/
-│   ├── auth.ts
-│   ├── config.ts
-│   ├── projects.ts
-│   ├── wins.ts
-│   └── resume.ts
-├── components/
-│   ├── admin/
-│   ├── hero/
-│   ├── about/
-│   ├── projects/
-│   ├── wins/
-│   ├── navigation/
-│   ├── contact/
-│   └── shared/
-├── lib/
-│   ├── auth.ts
-│   ├── r2.ts
-│   ├── validate.ts
-│   ├── sanitize.ts
-│   └── db/models/
-├── scripts/
-│   ├── seed-admin.ts
-│   └── normalize-project-badges.ts
-└── types/
+├── actions/             # Server actions for mutations
+├── app/                 # Next.js App Router
+│   ├── admin/           # Secured CMS Dashboard
+│   ├── layout.tsx       # Root layout & providers
+│   ├── page.tsx         # Public Homepage
+├── components/          # Reusable UI elements
+│   ├── admin/           # Admin-specific forms and data tables
+│   ├── ...              # Public components by feature area
+├── lib/                 # Core logic
+│   ├── admin/           # Admin queries and authorization
+│   ├── db/              # Mongoose models (Canonical Architecture)
+│   ├── public/          # Public-facing data adapters (read-only)
+│   ├── typography.ts    # Design system typography tokens
+│   └── r2.ts            # Cloudflare R2 bucket interactions
+└── public/              # Static assets
 ```
 
 ---
 
-## Database Model
+## Database Model (Canonical CMS)
 
-Collections used:
+The platform relies on the following MongoDB collections:
 
-1. users
-2. projects
-3. wins
-4. resume
-5. siteconfigs
+1. `users`: Auth credentials for admin access.
+2. `sitesettings`: A strict singleton configuration for identity, hero, SEO, and layout.
+3. `projects`: V2 Canonical model for case studies, featuring arrays for skills and roles.
+4. `roles`: Professional, leadership, and community roles.
+5. `educations`: Academic history and degree programs.
+6. `skills`: Technical skill taxonomy (frameworks, tools).
+7. `events`: Hackathons, competitions, and conferences.
+8. `awards`: Honors and competition placements (linking to events/projects).
+9. `certifications`: Verified credentials and certificates.
+10. `resumes`: PDF resume management and active version control.
 
-### Notable behavior
+### Design Principles
 
-1. `projects` are sorted by `order` for stable display.
-2. `wins` are sorted by latest date first.
-3. `resume` keeps exactly one active CV at a time.
-4. `siteconfigs` acts as a singleton content source for Hero, About, and Certifications content.
-5. `about.achievements` is an ordered array, and that order drives the public slideshow sequence.
-6. `about.certifications` can now carry opaque public IDs and R2-backed image URLs for shareable certificate pages.
-7. `about.certifications` array order is managed in admin and directly controls public certificate order in both grid and slideshow modes.
-8. `about.heading` and `about.bullets` are editable from admin content controls and rendered on the public About section.
+- **No Data Duplication:** Instead of inline skills string arrays, models use relational `skillIds` pointing to the canonical `Skill` model.
+- **Strict Publication Status:** All entities have a `publicationStatus` (`draft`, `published`, `archived`) allowing safe staging of content.
+- **Data Validation:** Zod validates every incoming request, ensuring only clean and strictly-typed data enters the database.
 
 ---
 
-## Upload and Delivery Pipeline
+## Media Pipeline (Cloudflare R2)
 
-For project images (including SVG), certificate images, and resume PDFs:
+For project thumbnails, banners, and CV PDFs:
 
-1. User selects file in admin UI.
-2. Client submits via form data to Server Action.
-3. Server Action uploads to Cloudflare R2.
-4. Public file URL is saved to MongoDB.
-5. Relevant paths are revalidated.
+1. Admin selects a file in the UI.
+2. Client submits `FormData` to a Server Action.
+3. Server Action verifies auth, parses the payload, and streams it to Cloudflare R2 via AWS SDK.
+4. Public R2 URL is returned and persisted directly onto the relevant MongoDB document (`thumbnailUrl`, `mediaUrl`, etc).
+5. Next.js cache is revalidated.
 
-On delete:
-
-1. Object is removed from R2.
-2. Database reference is removed.
-
-Certificate links are routed through app pages rather than sharing raw storage URLs as the primary user entry point.
+*Note: Legacy `MediaAsset` model tracking was deprecated in favor of storing URLs directly on canonical records to simplify the data lifecycle.*
 
 ---
 
@@ -277,16 +135,16 @@ ADMIN_PASSWORD=
 ## Local Development
 
 ```bash
-# Install packages
+# Install dependencies
 npm install
 
-# Start dev server
+# Start development server
 npm run dev
 ```
 
 Open http://localhost:3000
 
-### Seed admin user
+### Seed Admin User
 
 ```bash
 npm run seed
@@ -301,47 +159,17 @@ npm run seed
 | `npm run dev` | Start development server |
 | `npm run build` | Build production app |
 | `npm run start` | Start production server |
-| `npm run lint` | Run lint checks |
+| `npm run lint` | Run ESLint |
 | `npm run seed` | Seed default admin user |
-| `npm run normalize:project-badges` | Normalize existing badge labels |
 
 ---
 
 ## Security Notes
 
-1. Dashboard routes are protected through `proxy.ts`.
-2. All mutating actions verify session first.
-3. Zod validation blocks malformed payloads.
-4. Plain text content is normalized before persistence and rendered through React text nodes instead of storing HTML entities.
-5. Storage credentials are server-only.
-6. Certificate detail pages use opaque `publicId` values and are intended for direct-link sharing rather than search discovery.
-
----
-
-## Deployment
-
-1. Push to GitHub.
-2. Import repository in Vercel.
-3. Add environment variables.
-4. Deploy and verify admin + upload flows.
-
-Recommended checks after deploy:
-
-1. Public pages load with dynamic content.
-2. Admin login redirects and protection rules work.
-3. Project image upload/delete works, including SVG logos in project media.
-4. Resume activate/deactivate flow works across Hero/Nav/Mobile Menu.
-5. Certificate image upload, reorder controls, and replacement work from the content dashboard.
-6. Certificate display uses grid for 1 to 3 cards and switches to slideshow for 4+ cards with slow autoplay (desktop shows 3 cards per slide, mobile shows 1).
-7. Shared certificate URLs resolve correctly and remain excluded from indexing.
-
----
-
-## Contact
-
-- Email: hi.talhaahmad@gmail.com
-- LinkedIn: https://linkedin.com/in/talha-ahmad9
-- GitHub: https://github.com/Talhaahmad9
+1. Dashboard routes are deeply protected through Next.js middleware and `requireAdmin` server-side helpers.
+2. All mutating actions verify session and database-level permissions first.
+3. Zod validation completely rejects malformed payloads and handles sanitization.
+4. Storage credentials and database URIs remain strictly server-only.
 
 ---
 

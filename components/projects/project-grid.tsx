@@ -1,12 +1,12 @@
 import SectionWrapper, { SectionItem } from "@/components/shared/section-wrapper";
 import ProjectCard from "./project-card";
 import ProjectShowcase from "./project-showcase";
-import { IProject } from "@/lib/db/models/Project";
+import type { PublicProject } from "@/lib/public/projects";
 import { typography } from "@/lib/typography";
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export default function ProjectGrid({ projects }: { projects: IProject[] }) {
+export default function ProjectGrid({ projects }: { projects: PublicProject[] }) {
   const useShowcase = projects.length > 3;
 
   return (
@@ -15,15 +15,17 @@ export default function ProjectGrid({ projects }: { projects: IProject[] }) {
 
         {/* Heading */}
         <SectionItem>
-          <p className={`mb-2 ${typography.sectionEyebrow}`}>
-            Work
-          </p>
+          <div className="flex items-center gap-2 mb-2">
+            <span className="font-mono text-xs font-semibold text-orangeWeb tracking-widest uppercase">
+              03 // SELECTED WORK
+            </span>
+          </div>
           <h2 className={typography.sectionTitle}>
-            Projects
+            Featured Projects & Case Studies
           </h2>
           <p className={`mt-3 max-w-2xl ${typography.sectionDescription}`}>
-            From GenAI hackathon wins to live production apps — here&apos;s
-            what I&apos;ve shipped.
+            From flagship production architectures to AI hackathon solutions — here&apos;s
+            what I&apos;ve engineered.
           </p>
         </SectionItem>
 
@@ -43,7 +45,7 @@ export default function ProjectGrid({ projects }: { projects: IProject[] }) {
         ) : (
           <div className="mt-12 grid gap-6 sm:grid-cols-2">
             {projects.map((project) => (
-              <SectionItem key={project._id ? String(project._id) : project.title}>
+              <SectionItem key={project.id || project.title}>
                 <ProjectCard project={project} />
               </SectionItem>
             ))}

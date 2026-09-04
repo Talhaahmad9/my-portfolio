@@ -4,8 +4,6 @@ import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import PageTransition from "@/components/shared/page-transition";
 import BackToTop from "@/components/shared/back-to-top";
-import CursorGlow from "@/components/shared/cursor-glow";
-import ParticleNetwork from "@/components/hero/particle-network";
 
 // ─── Fonts ────────────────────────────────────────────────────────────────────
 const bodyFont = Instrument_Sans({
@@ -26,43 +24,68 @@ const geistMono = Geist_Mono({
   display: "swap",
 });
 
-// ─── SEO Metadata ─────────────────────────────────────────────────────────────
-export const metadata: Metadata = {
-  title: "Talha Ahmad | Full Stack Developer",
-  description:
-    "Full Stack Developer building high-performance web applications and production-grade AI systems.",
-  metadataBase: new URL("https://talhaahmad.me"),
-  alternates: {
-    canonical: "https://talhaahmad.me",
-  },
-  verification: {
-    google: "76_987pdZ9u8OKA3pi0fkXpOklT-QRGBv0msa2sQ8VY",
-  },
-  openGraph: {
-    type: "website",
-    locale: "en_US",
-    url: "https://talhaahmad.me",
-    siteName: "Talha Ahmad",
-    title: "Talha Ahmad | Full Stack Developer",
-    description:
-      "Full Stack Developer building high-performance web applications and production-grade AI systems.",
-    images: [
-      {
-        url: "/avatar.png",
-        width: 1200,
-        height: 630,
-        alt: "Talha Ahmad — Full Stack Developer",
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Talha Ahmad | Full Stack Developer",
-    description:
-      "Full Stack Developer building high-performance web applications and production-grade AI systems.",
-    images: ["/og-image.JPG"],
-  },
-};
+import { getCanonicalSiteSeo } from "@/lib/public/site-settings";
+
+export async function generateMetadata(): Promise<Metadata> {
+  let seo: {
+    title: string;
+    description: string;
+    ogImageUrl?: string;
+    noIndex: boolean;
+    canonicalUrl: string;
+  } = {
+    title: "Talha Ahmad | Full-Stack Developer",
+    description: "Full-Stack Developer building high-performance web applications and production-grade AI systems.",
+    ogImageUrl: "/avatar.png",
+    noIndex: false,
+    canonicalUrl: "https://talhaahmad.me",
+  };
+
+  try {
+    seo = await getCanonicalSiteSeo();
+  } catch (error) {
+    console.error("Failed to load canonical SEO settings for root metadata:", error);
+  }
+
+  return {
+    title: seo.title,
+    description: seo.description,
+    metadataBase: new URL(seo.canonicalUrl),
+    alternates: {
+      canonical: seo.canonicalUrl,
+    },
+    robots: seo.noIndex
+      ? { index: false, follow: false }
+      : { index: true, follow: true },
+    verification: {
+      google: "76_987pdZ9u8OKA3pi0fkXpOklT-QRGBv0msa2sQ8VY",
+    },
+    openGraph: {
+      type: "website",
+      locale: "en_US",
+      url: seo.canonicalUrl,
+      siteName: "Talha Ahmad",
+      title: seo.title,
+      description: seo.description,
+      images: seo.ogImageUrl
+        ? [
+            {
+              url: seo.ogImageUrl,
+              width: 1200,
+              height: 630,
+              alt: seo.title,
+            },
+          ]
+        : [],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: seo.title,
+      description: seo.description,
+      images: seo.ogImageUrl ? [seo.ogImageUrl] : [],
+    },
+  };
+}
 
 // ─── Schema.org / JSON-LD ─────────────────────────────────────────────────────
 const personSchema = {
@@ -96,8 +119,6 @@ export default function RootLayout({
       <body
         className={`${bodyFont.variable} ${headingFont.variable} ${geistMono.variable} relative overflow-x-hidden bg-[#0d1117] text-white antialiased`}
       >
-        <ParticleNetwork fullscreen className="pointer-events-none fixed inset-0 z-0 h-full w-full opacity-65" />
-        <CursorGlow />
         <PageTransition>{children}</PageTransition>
         <BackToTop />
         <Analytics />

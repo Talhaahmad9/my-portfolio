@@ -1,38 +1,39 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { BriefcaseBusiness, Download, FolderGit2 } from "lucide-react";
+import { Download } from "lucide-react";
 import InlineLoader from "@/components/shared/InlineLoader";
-import { GITHUB_URL, LINKEDIN_URL } from "@/lib/config";
 import { getDownloadFilename } from "@/lib/getDownloadFilename";
 import { downloadFile } from "@/utils/downloadFile";
-import { typography } from "@/lib/typography";
 import MobileMenu from "./mobile-menu";
 
 const navLinks = [
-  { label: "About",    href: "#about"    },
+  { label: "Experience", href: "#experience" },
+  { label: "About", href: "#about" },
+  { label: "Work", href: "#projects" },
+  { label: "Recognition", href: "#wins" },
   { label: "Certificates", href: "#certifications" },
-  { label: "Projects", href: "#projects" },
-  { label: "Contact",  href: "#contact"  },
 ];
 
-// ─── Animation ────────────────────────────────────────────────────────────────
-
-const navVariants = {
+const navVariants: Variants = {
   hidden: { y: -24, opacity: 0 },
   visible: {
     y: 0,
     opacity: 1,
-    transition: { duration: 0.5 },
+    transition: { duration: 0.4, ease: "easeOut" },
   },
 };
 
-// ─── Component ────────────────────────────────────────────────────────────────
-
-export default function Navbar({ resumeUrl, resumeLabel }: { resumeUrl: string | null; resumeLabel?: string | null }) {
+export default function Navbar({
+  resumeUrl,
+  resumeLabel,
+}: {
+  resumeUrl: string | null;
+  resumeLabel?: string | null;
+}) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [loadingDownload, setLoadingDownload] = useState(false);
 
@@ -54,102 +55,96 @@ export default function Navbar({ resumeUrl, resumeLabel }: { resumeUrl: string |
       variants={navVariants}
       initial="hidden"
       animate="visible"
-      className={`fixed top-0 inset-x-0 z-50 border-b transition-all duration-300 ${
+      className={`fixed top-0 inset-x-0 z-50 transition-colors duration-300 ${
         isScrolled
-          ? "border-orangeWeb/10 bg-black/45 shadow-[0_12px_48px_rgba(0,0,0,0.22)] backdrop-blur-xl"
-          : "border-transparent bg-transparent shadow-none backdrop-blur-none"
+          ? "border-b border-platinum/10 bg-[#0d1117]/90 backdrop-blur-md shadow-lg"
+          : "border-b border-platinum/5 bg-[#0d1117]/60 backdrop-blur-sm"
       }`}
     >
-      <nav className="relative mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-        {/* Logo image */}
-        <Link href="/" className="flex items-center gap-2 shrink-0">
-          <Image
-            src="/logo.png"
-            alt="Talha Ahmad logo"
-            width={36}
-            height={36}
-            priority
-            className="object-contain"
-          />
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8 h-18 sm:h-20">
+        {/* LEFT: Brand */}
+        <Link href="/" className="flex items-center gap-3 shrink-0 group">
+          <div className="relative rounded-md border border-platinum/15 bg-black/40 p-1 transition-colors group-hover:border-orangeWeb/60">
+            <Image
+              src="/logo.png"
+              alt="Talha Ahmad logo"
+              width={30}
+              height={30}
+              priority
+              className="object-contain"
+            />
+          </div>
+          <span className="text-base font-semibold text-white tracking-tight group-hover:text-platinum transition-colors">
+            Talha Ahmad
+          </span>
         </Link>
 
-        {/* Nav links */}
-        <ul className="hidden sm:flex items-center gap-8">
-          {navLinks.map(({ label, href }, i) => (
-            <motion.li
+        {/* CENTER: Primary Navigation */}
+        <nav aria-label="Main Navigation" className="hidden md:flex items-center gap-7">
+          {navLinks.map(({ label, href }) => (
+            <Link
               key={href}
-              initial={{ opacity: 0, y: -8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 + i * 0.08, duration: 0.4 }}
+              href={href}
+              className="text-[14px] font-medium text-platinum/75 transition-colors hover:text-orangeWeb relative py-1"
             >
-              <Link
-                href={href}
-                className={`${typography.navLink} font-medium`}
-              >
-                {label}
-              </Link>
-            </motion.li>
+              {label}
+            </Link>
           ))}
-        </ul>
+        </nav>
 
-        {/* Desktop: social links + CV button */}
-        <div className="hidden sm:flex items-center gap-4">
-          <a
-            href={GITHUB_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-base text-platinum transition-colors hover:text-orangeWeb"
+        {/* RIGHT: Actions (CV + Resume) */}
+        <div className="hidden md:flex items-center gap-5 shrink-0">
+          <Link
+            href="/cv"
+            className="text-[14px] font-medium text-platinum/80 transition-colors hover:text-orangeWeb py-1"
           >
-            <FolderGit2 className="h-4 w-4" aria-hidden="true" />
-            GitHub
-          </a>
-          <a
-            href={LINKEDIN_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-base text-platinum transition-colors hover:text-orangeWeb"
-          >
-            <BriefcaseBusiness className="h-4 w-4" aria-hidden="true" />
-            LinkedIn
-          </a>
+            CV
+          </Link>
+
           {resumeUrl && (
             <a
               href="/api/resume/download"
               target="_blank"
               rel="noopener noreferrer"
-              // server will set Content-Disposition
               download={getDownloadFilename(resumeLabel ?? null, resumeUrl)}
               onClick={async (e) => {
                 e.preventDefault();
                 setLoadingDownload(true);
                 try {
-                  await downloadFile('/api/resume/download', getDownloadFilename(resumeLabel ?? null, resumeUrl));
+                  await downloadFile(
+                    "/api/resume/download",
+                    getDownloadFilename(resumeLabel ?? null, resumeUrl)
+                  );
                 } catch (err) {
                   console.error(err);
-                  window.open('/api/resume/download', "_blank");
-                  try { alert('Download failed — opening in a new tab.'); } catch {}
+                  window.open("/api/resume/download", "_blank");
+                  try {
+                    alert("Download failed — opening in a new tab.");
+                  } catch {}
                 } finally {
                   setLoadingDownload(false);
                 }
               }}
               aria-busy={loadingDownload}
-              className={`inline-flex items-center gap-2 rounded-md bg-orangeWeb px-4 py-2 text-base font-semibold text-black transition-opacity hover:opacity-90 ${loadingDownload ? 'opacity-80 pointer-events-none' : ''}`}
+              className={`inline-flex items-center gap-1.5 rounded border border-orangeWeb/40 bg-orangeWeb/5 px-3 py-1.5 text-[13px] font-medium text-orangeWeb transition-all hover:bg-orangeWeb hover:text-black ${
+                loadingDownload ? "opacity-80 pointer-events-none" : ""
+              }`}
             >
               {loadingDownload ? (
-                <InlineLoader size={18} />
+                <InlineLoader size={14} />
               ) : (
                 <>
-                  <Download className="h-4 w-4" aria-hidden="true" />
-                  CV
+                  <span>Resume</span>
+                  <Download className="h-3.5 w-3.5" aria-hidden="true" />
                 </>
               )}
             </a>
           )}
         </div>
 
-        {/* Mobile: hamburger (renders its own drawer) */}
+        {/* MOBILE: Hamburger */}
         <MobileMenu resumeUrl={resumeUrl} resumeLabel={resumeLabel} />
-      </nav>
+      </div>
     </motion.header>
   );
 }

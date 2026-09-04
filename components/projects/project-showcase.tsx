@@ -4,15 +4,15 @@ import Autoplay from "embla-carousel-autoplay";
 import useEmblaCarousel from "embla-carousel-react";
 import { ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { IProject } from "@/lib/db/models/Project";
+import type { PublicProject } from "@/lib/public/projects";
 import ProjectCard from "./project-card";
 
 interface ProjectShowcaseProps {
-  projects: IProject[];
+  projects: PublicProject[];
 }
 
-function chunkProjects(items: IProject[], chunkSize: number): IProject[][] {
-  const chunks: IProject[][] = [];
+function chunkProjects(items: PublicProject[], chunkSize: number): PublicProject[][] {
+  const chunks: PublicProject[][] = [];
   for (let index = 0; index < items.length; index += chunkSize) {
     chunks.push(items.slice(index, index + chunkSize));
   }
@@ -137,7 +137,7 @@ export default function ProjectShowcase({ projects }: ProjectShowcaseProps) {
                 <div className="grid gap-3 lg:grid-cols-3">
                   {slide.map((project) => (
                     <ProjectCard
-                      key={project._id ? String(project._id) : project.title}
+                      key={project.id || project.title}
                       project={project}
                     />
                   ))}

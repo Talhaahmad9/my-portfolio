@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import Image from "next/image";
@@ -30,7 +31,7 @@ export default function ProjectCarousel({ images, title, imageFit = "cover" }: P
 
   useEffect(() => {
     if (!emblaApi) return;
-    onSelect();
+    queueMicrotask(() => onSelect());
     emblaApi.on("select", onSelect);
     emblaApi.on("reInit", onSelect);
   }, [emblaApi, onSelect]);
@@ -42,7 +43,7 @@ export default function ProjectCarousel({ images, title, imageFit = "cover" }: P
           {images.map((img, index) => (
             <div key={index} className="relative h-full w-full flex-[0_0_100%] min-w-0">
               {isSvgImage(img) ? (
-                <img
+              <img
                   src={img}
                   alt={`${title} image ${index + 1}`}
                   className={`h-full w-full ${imageFit === "contain" ? "object-contain" : "object-cover"}`}

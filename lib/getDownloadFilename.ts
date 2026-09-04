@@ -25,7 +25,7 @@ export function getDownloadFilename(label?: string | null, fileUrl?: string | nu
       name = name.replace(/^\d+-/, "");
       name = sanitizeName(name.replace(/\.pdf$/i, ""));
       return name ? `${name}.pdf` : "resume.pdf";
-    } catch (e) {
+    } catch {
       // fallback
     }
   }

@@ -42,7 +42,7 @@ export default function HeroTypewriter({ strings }: HeroTypewriterProps) {
     }
 
     return () => clearTimeout(timeout);
-  }, [text, isDeleting, stringIndex]);
+  }, [text, isDeleting, stringIndex, strings]);
 
   // Blinking cursor logic
   useEffect(() => {
@@ -57,9 +57,9 @@ export default function HeroTypewriter({ strings }: HeroTypewriterProps) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-      className="flex flex-col items-center"
+      className="flex flex-col items-start text-left"
     >
-      <p className={`mb-4 ${typography.heroKicker}`}>
+      <p className={`mb-3 ${typography.heroKicker}`}>
         Hi, my name is
       </p>
       
@@ -67,7 +67,7 @@ export default function HeroTypewriter({ strings }: HeroTypewriterProps) {
         Talha Ahmad.
       </h1>
 
-      <h2 className={`mt-5 ${typography.heroRole}`}>
+      <h2 className={`mt-3 ${typography.heroRole}`}>
         {text}
         <span
           className={`text-orangeWeb transition-opacity duration-75 ${

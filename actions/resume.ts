@@ -4,7 +4,11 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { IResume, ResumeModel } from "@/lib/db/models/Resume";
-import { deleteFromR2, extractR2Key, uploadToR2 } from "@/lib/r2";
+import {
+  cleanupObsoleteR2Objects,
+  rollbackR2Uploads,
+  uploadToR2,
+} from "@/lib/r2";
 import { resumeSchema } from "@/lib/validate";
 
 interface ActionResult<T> {
@@ -68,17 +72,22 @@ export async function uploadResume(formData: FormData): Promise<ActionResult<IRe
     return { success: false, error: "File size must be 10MB or less" };
   }
 
+  let uploadedKey: string | null = null;
   try {
     const key = `resumes/${Date.now()}-${sanitizeLabelForKey(labelParse.data)}.pdf`;
     const buffer = Buffer.from(await fileEntry.arrayBuffer());
-    const fileUrl = await uploadToR2(buffer, key, "application/pdf");
+    const uploaded = await uploadToR2(buffer, key, "application/pdf");
+    uploadedKey = uploaded.key;
 
     const parsedResume = resumeSchema.safeParse({
       label: labelParse.data,
-      fileUrl,
+      fileUrl: uploaded.url,
     });
 
     if (!parsedResume.success) {
+      if (uploadedKey) {
+        await rollbackR2Uploads([uploadedKey]);
+      }
       return {
         success: false,
         error: parsedResume.error.issues[0]?.message ?? "Invalid resume data",
@@ -92,9 +101,13 @@ export async function uploadResume(formData: FormData): Promise<ActionResult<IRe
 
     revalidatePath("/admin/dashboard/resume");
     revalidatePath("/");
+    revalidatePath("/cv");
 
     return { success: true, data: toPlainResume(created.toObject()) as IResume };
   } catch (error: unknown) {
+    if (uploadedKey) {
+      await rollbackR2Uploads([uploadedKey]);
+    }
     const message = error instanceof Error ? error.message : "Failed to upload resume";
     return { success: false, error: message };
   }
@@ -112,19 +125,21 @@ export async function setActiveResume(id: string): Promise<ActionResult<null>> {
   }
 
   try {
-    await ResumeModel.updateMany({}, { isActive: false });
-    const updated = await ResumeModel.findByIdAndUpdate(
-      parsedId.data,
-      { isActive: true },
-      { new: true }
-    ).lean();
-
-    if (!updated) {
+    const targetResume = await ResumeModel.findById(parsedId.data).lean();
+    if (!targetResume) {
       return { success: false, error: "Resume not found" };
     }
 
+    if (targetResume.isActive) {
+      return { success: true, data: null };
+    }
+
+    await ResumeModel.updateMany({ _id: { $ne: targetResume._id } }, { isActive: false });
+    await ResumeModel.findByIdAndUpdate(targetResume._id, { isActive: true });
+
     revalidatePath("/admin/dashboard/resume");
     revalidatePath("/");
+    revalidatePath("/cv");
 
     return { success: true, data: null };
   } catch (error: unknown) {
@@ -150,11 +165,20 @@ export async function deleteResume(id: string): Promise<ActionResult<null>> {
       return { success: false, error: "Resume not found" };
     }
 
-    await deleteFromR2(extractR2Key(resume.fileUrl));
-    await ResumeModel.findByIdAndDelete(parsedId.data);
+    const fileUrlToDelete = resume.fileUrl;
+
+    const deleted = await ResumeModel.findByIdAndDelete(parsedId.data).lean();
+    if (!deleted) {
+      return { success: false, error: "Resume not found" };
+    }
+
+    if (fileUrlToDelete) {
+      await cleanupObsoleteR2Objects([fileUrlToDelete]);
+    }
 
     revalidatePath("/admin/dashboard/resume");
     revalidatePath("/");
+    revalidatePath("/cv");
 
     return { success: true, data: null };
   } catch (error: unknown) {

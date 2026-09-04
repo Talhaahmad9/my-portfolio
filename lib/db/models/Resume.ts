@@ -1,5 +1,4 @@
 import mongoose, { Document, Model, Schema } from "mongoose";
-import { connectDB } from "@/lib/db/mongo";
 
 export interface IResume extends Document {
   label: string;
@@ -27,8 +26,6 @@ const ResumeSchema = new Schema<IResume>({
     default: Date.now,
   },
 });
-
-await connectDB();
 
 export const ResumeModel: Model<IResume> =
   (mongoose.models.Resume as Model<IResume>) ??

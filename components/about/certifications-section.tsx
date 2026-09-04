@@ -4,10 +4,18 @@ import { Check, ExternalLink } from "lucide-react";
 import CertificateSlideshow from "@/components/about/certificate-slideshow";
 import SectionWrapper, { SectionItem } from "@/components/shared/section-wrapper";
 import { typography } from "@/lib/typography";
-import type { ICertification } from "@/lib/db/models/SiteConfig";
+import type { PublicCertification } from "@/lib/public/certifications";
+
+export interface CertItem {
+  publicId?: string;
+  name: string;
+  issuer: string;
+  imageUrl?: string;
+  mediaUrl?: string;
+}
 
 interface CertificationsSectionProps {
-  certifications: ICertification[];
+  certifications: (PublicCertification | CertItem)[];
 }
 
 export default function CertificationsSection({
@@ -20,12 +28,16 @@ export default function CertificationsSection({
   }
 
   return (
-    <SectionWrapper id="certifications" className="py-24 px-6 bg-transparent">
+    <SectionWrapper id="certifications" className="py-24 px-4 sm:px-6 lg:px-8 bg-transparent">
       <div className="mx-auto max-w-6xl">
         <SectionItem>
-          <p className={`mb-2 ${typography.sectionEyebrow}`}>Certifications</p>
+          <div className="flex items-center gap-2 mb-2">
+            <span className="font-mono text-xs font-semibold text-orangeWeb tracking-widest uppercase">
+              05 // CERTIFICATIONS
+            </span>
+          </div>
           <h2 className={typography.sectionTitle}>
-            Verified training, coursework, and technical milestones
+            Verified Training & Technical Credentials
           </h2>
         </SectionItem>
 
@@ -35,8 +47,9 @@ export default function CertificationsSection({
               <CertificateSlideshow certifications={certifications} />
             ) : (
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {certifications.map((cert) => (
-                  cert.publicId && cert.imageUrl ? (
+                {certifications.map((cert) => {
+                  const imageSrc = cert.mediaUrl || ("imageUrl" in cert ? cert.imageUrl : undefined);
+                  return cert.publicId && imageSrc ? (
                     <Link
                       key={cert.publicId}
                       href={`/certificates/${cert.publicId}`}
@@ -44,7 +57,7 @@ export default function CertificationsSection({
                     >
                       <div className="relative aspect-4/3 overflow-hidden border-b border-platinum/10 bg-black/40">
                         <Image
-                          src={cert.imageUrl}
+                          src={imageSrc}
                           alt={cert.name}
                           fill
                           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
@@ -70,8 +83,8 @@ export default function CertificationsSection({
                         {cert.name} — {cert.issuer}
                       </p>
                     </div>
-                  )
-                ))}
+                  );
+                })}
               </div>
             )}
           </SectionItem>

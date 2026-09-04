@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, ExternalLink, ShieldCheck } from "lucide-react";
 import { notFound } from "next/navigation";
-import { getCertificateByPublicId } from "@/actions/config";
+import { getPublishedCertificateByPublicId } from "@/lib/public/certifications";
 
 interface CertificatePageProps {
   params: Promise<{
@@ -13,7 +13,7 @@ interface CertificatePageProps {
 
 export async function generateMetadata({ params }: CertificatePageProps): Promise<Metadata> {
   const { publicId } = await params;
-  const certificate = await getCertificateByPublicId(publicId);
+  const certificate = await getPublishedCertificateByPublicId(publicId);
 
   if (!certificate) {
     return {
@@ -32,13 +32,13 @@ export async function generateMetadata({ params }: CertificatePageProps): Promis
       index: false,
       follow: false,
     },
-    openGraph: certificate.imageUrl
+    openGraph: certificate.mediaUrl
       ? {
           title: `${certificate.name} | Certificate`,
           description: `${certificate.name} issued by ${certificate.issuer}`,
           images: [
             {
-              url: certificate.imageUrl,
+              url: certificate.mediaUrl,
               alt: certificate.name,
             },
           ],
@@ -49,7 +49,7 @@ export async function generateMetadata({ params }: CertificatePageProps): Promis
 
 export default async function CertificatePage({ params }: CertificatePageProps) {
   const { publicId } = await params;
-  const certificate = await getCertificateByPublicId(publicId);
+  const certificate = await getPublishedCertificateByPublicId(publicId);
 
   if (!certificate) {
     notFound();
@@ -68,10 +68,10 @@ export default async function CertificatePage({ params }: CertificatePageProps) 
 
         <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1.2fr)_320px] lg:items-start">
           <div className="overflow-hidden rounded-2xl border border-platinum/10 bg-oxfordBlue/70 shadow-[0_24px_64px_rgba(0,0,0,0.35)]">
-            {certificate.imageUrl ? (
+            {certificate.mediaUrl ? (
               <div className="relative aspect-4/3 w-full bg-black/40">
                 <Image
-                  src={certificate.imageUrl}
+                  src={certificate.mediaUrl}
                   alt={certificate.name}
                   fill
                   sizes="(max-width: 1024px) 100vw, 70vw"
@@ -107,9 +107,9 @@ export default async function CertificatePage({ params }: CertificatePageProps) 
               </p>
             </div>
 
-            {certificate.imageUrl && (
+            {certificate.mediaUrl && (
               <a
-                href={certificate.imageUrl}
+                href={certificate.mediaUrl}
                 target="_blank"
                 rel="noreferrer"
                 className="mt-6 inline-flex items-center gap-2 rounded-md bg-orangeWeb px-4 py-2 text-sm font-semibold text-black transition-colors hover:bg-orangeWeb/90"

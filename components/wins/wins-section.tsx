@@ -1,30 +1,28 @@
-import { IWin } from "@/lib/db/models/Win";
 import SectionWrapper, { SectionItem } from "@/components/shared/section-wrapper";
 import WinsGrid from "./wins-grid";
-import { Trophy } from "lucide-react";
+import { WinOrAwardItem } from "./win-card";
 import { typography } from "@/lib/typography";
 
 interface WinsSectionProps {
-  wins: IWin[];
+  wins: WinOrAwardItem[];
 }
 
 export default function WinsSection({ wins }: WinsSectionProps) {
   return (
-    <SectionWrapper id="wins" className="bg-oxfordBlue/20 py-24 px-6">
+    <SectionWrapper id="wins" className="bg-black/40 py-24 px-4 sm:px-6 lg:px-8 border-y border-platinum/10">
       <div className="mx-auto max-w-6xl">
         {/* Heading */}
         <SectionItem>
           <div className="flex items-center gap-2 mb-2">
-            <Trophy size={18} className="text-orangeWeb" />
-            <p className={typography.sectionEyebrow}>
-              Hall of Fame
-            </p>
+            <span className="font-mono text-xs font-semibold text-orangeWeb tracking-widest uppercase">
+              04 // RECOGNITION
+            </span>
           </div>
           <h2 className={typography.sectionTitle}>
             Achievements & Recognition
           </h2>
           <p className={`mt-3 max-w-2xl ${typography.sectionDescription}`}>
-            Competitions, hackathons, and milestones
+            Competitive hackathon victories, industry awards, and verified technical milestones.
           </p>
         </SectionItem>
 

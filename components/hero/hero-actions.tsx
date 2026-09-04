@@ -11,7 +11,23 @@ import InlineLoader from "@/components/shared/InlineLoader";
 
 // ─── CTA Buttons (client island for hover animations) ─────────────────────────
 
-export default function HeroActions({ resumeUrl, resumeLabel }: { resumeUrl: string | null; resumeLabel?: string | null }) {
+interface HeroActionsProps {
+  resumeUrl: string | null;
+  resumeLabel?: string | null;
+  ctaPrimaryText?: string;
+  ctaPrimaryHref?: string;
+  ctaSecondaryText?: string;
+  ctaSecondaryHref?: string;
+}
+
+export default function HeroActions({
+  resumeUrl,
+  resumeLabel,
+  ctaPrimaryText = "Hire Me",
+  ctaPrimaryHref = `mailto:${EMAIL}`,
+  ctaSecondaryText = "View my work",
+  ctaSecondaryHref = "#projects",
+}: HeroActionsProps) {
   const [loading, setLoading] = useState(false);
   const filename = getDownloadFilename(resumeLabel ?? null, resumeUrl ?? null);
 
@@ -32,15 +48,15 @@ export default function HeroActions({ resumeUrl, resumeLabel }: { resumeUrl: str
     }
   }
   return (
-    <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+    <div className="mt-8 flex flex-wrap items-center justify-start gap-3.5">
       <motion.a
-        href={`mailto:${EMAIL}`}
+        href={ctaPrimaryHref}
         whileHover={{ scale: 1.04 }}
         whileTap={{ scale: 0.97 }}
         className="inline-flex items-center gap-2 rounded-md bg-orangeWeb px-6 py-3.5 text-base font-semibold text-black transition-opacity hover:opacity-90"
       >
         <Mail className="h-4 w-4" aria-hidden="true" />
-        Hire Me
+        {ctaPrimaryText}
       </motion.a>
 
       {resumeUrl && (
@@ -85,10 +101,10 @@ export default function HeroActions({ resumeUrl, resumeLabel }: { resumeUrl: str
         transition={{ delay: 0.8, duration: 0.6 }}
       >
         <Link
-          href="#projects"
+          href={ctaSecondaryHref}
           className="inline-flex items-center gap-2 text-base text-platinum underline-offset-4 hover:text-orangeWeb hover:underline"
         >
-          View my work
+          {ctaSecondaryText}
           <ArrowRight className="h-4 w-4" aria-hidden="true" />
         </Link>
       </motion.div>

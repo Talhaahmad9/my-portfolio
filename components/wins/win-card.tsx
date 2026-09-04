@@ -1,14 +1,30 @@
 "use client";
 
-import { IWin } from "@/lib/db/models/Win";
 import { Trophy } from "lucide-react";
 import { typography } from "@/lib/typography";
 
+export interface WinOrAwardItem {
+  _id?: string;
+  id?: string;
+  title: string;
+  event?: string;
+  eventLabel?: string;
+  place?: string;
+  placement?: string;
+  score?: string;
+  description?: string;
+  stack?: string[];
+  date: Date | string;
+}
+
 interface WinCardProps {
-  win: IWin;
+  win: WinOrAwardItem;
 }
 
 export default function WinCard({ win }: WinCardProps) {
+  const placeBadge = win.placement || win.place || "Winner";
+  const eventLabel = win.eventLabel || win.event || "";
+
   const getBadgeColors = (place: string) => {
     const p = place.toLowerCase();
     if (p.includes("1st")) return "bg-orangeWeb text-black border border-transparent";
@@ -26,8 +42,8 @@ export default function WinCard({ win }: WinCardProps) {
     <div className="group flex h-full flex-col rounded-lg border border-platinum/10 bg-oxfordBlue p-6 transition-colors hover:border-orangeWeb">
       <div className="flex items-start justify-between gap-4 mb-4">
         <Trophy size={20} className="text-orangeWeb shrink-0" />
-        <span className={`rounded-md px-2.5 py-1 text-sm font-semibold ${getBadgeColors(win.place)}`}>
-          {win.place}
+        <span className={`rounded-md px-2.5 py-1 text-sm font-semibold ${getBadgeColors(placeBadge)}`}>
+          {placeBadge}
         </span>
       </div>
 
@@ -36,7 +52,7 @@ export default function WinCard({ win }: WinCardProps) {
       </h3>
       
       <p className="mt-2 text-base text-platinum">
-        {win.event}
+        {eventLabel}
       </p>
 
       {win.score && (

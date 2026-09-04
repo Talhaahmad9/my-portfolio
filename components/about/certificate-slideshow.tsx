@@ -7,22 +7,26 @@ import Link from "next/link";
 import { Check, ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { typography } from "@/lib/typography";
-import type { ICertification } from "@/lib/db/models/SiteConfig";
+import type { PublicCertification } from "@/lib/public/certifications";
+import type { CertItem } from "./certifications-section";
+
+type SlideshowCert = PublicCertification | CertItem;
 
 interface CertificateSlideshowProps {
-  certifications: ICertification[];
+  certifications: SlideshowCert[];
 }
 
-function chunkCertifications(items: ICertification[], chunkSize: number): ICertification[][] {
-  const chunks: ICertification[][] = [];
+function chunkCertifications(items: SlideshowCert[], chunkSize: number): SlideshowCert[][] {
+  const chunks: SlideshowCert[][] = [];
   for (let index = 0; index < items.length; index += chunkSize) {
     chunks.push(items.slice(index, index + chunkSize));
   }
   return chunks;
 }
 
-function CertificateCard({ certification }: { certification: ICertification }) {
-  if (certification.publicId && certification.imageUrl) {
+function CertificateCard({ certification }: { certification: SlideshowCert }) {
+  const imageSrc = certification.mediaUrl || ("imageUrl" in certification ? certification.imageUrl : undefined);
+  if (certification.publicId && imageSrc) {
     return (
       <Link
         href={`/certificates/${certification.publicId}`}
@@ -30,7 +34,7 @@ function CertificateCard({ certification }: { certification: ICertification }) {
       >
         <div className="relative aspect-4/3 overflow-hidden border-b border-platinum/10 bg-black/40">
           <Image
-            src={certification.imageUrl}
+            src={imageSrc}
             alt={certification.name}
             fill
             sizes="(max-width: 1024px) 100vw, 65vw"
